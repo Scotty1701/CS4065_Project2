@@ -1,0 +1,10 @@
+[project]
+name = "client"
+version = "0.0.1"
+dependencies = [
+    "requests",
+    'importlib-metadata; python_version<"3.8"',
+]
+[project.scripts]
+client=client:cli
+   
