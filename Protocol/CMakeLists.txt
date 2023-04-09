@@ -36,3 +36,23 @@ target_include_directories(${LIB_NAME} PUBLIC
 
 # Link the target to its dependent libraries
 target_link_libraries(${LIB_NAME} PUBLIC jsoncpp_lib)
+
+# Specify where to install targets and define the EXPORT target name
+install(TARGETS ${LIB_NAME}
+    EXPORT ${LIB_NAME}Targets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION lib
+    INCLUDES DESTINATION include
+    PUBLIC_HEADER DESTINATION include
+)
+
+# Install the exported target
+install(EXPORT ${LIB_NAME}Targets
+    FILE "${LIB_NAME}Targets.cmake"
+    NAMESPACE "${LIB_NAME}::"
+    DESTINATION cmake
+)
+
+# Install
+install(TARGETS ${LIB_NAME} DESTINATION lib)
