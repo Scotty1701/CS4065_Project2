@@ -26,7 +26,7 @@ include_directories(${JSON_INC_PATH})
 add_library(${LIB_NAME} STATIC src/spam_api.cpp)
 
 # Set the public header(s) of the library
-set_target_properties(${LIB_NAME} PROPERTIES PUBLIC_HEADER "include/spam_api.h")
+set_target_properties(${LIB_NAME} PROPERTIES PUBLIC_HEADER "include/spam_api.hpp")
 
 # Set the include directories
 target_include_directories(${LIB_NAME} PUBLIC
