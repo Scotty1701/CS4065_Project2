@@ -42,7 +42,7 @@ install(TARGETS ${LIB_NAME}
     EXPORT ${LIB_NAME}Targets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
-    RUNTIME DESTINATION lib
+    RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
     PUBLIC_HEADER DESTINATION include
 )
@@ -54,5 +54,22 @@ install(EXPORT ${LIB_NAME}Targets
     DESTINATION cmake
 )
 
-# Install
-install(TARGETS ${LIB_NAME} DESTINATION lib)
+# Create the Config and Version files
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}Config.cmake"
+    INSTALL_DESTINATION cmake
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+# Install the Config and Version Files
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}ConfigVersion.cmake"
+    DESTINATION cmake
+)
