@@ -5,7 +5,7 @@ namespace spam_api {
 // Message Generation
 
 // Create a message to request a connection
-Json::Value gen_request_connect(std::string address, std::string port);
+std::string gen_request_connect(std::string address, std::string port);
 
 // Create a message to respond to a connection request
 Json::Value gen_respond_connect(bool success);
