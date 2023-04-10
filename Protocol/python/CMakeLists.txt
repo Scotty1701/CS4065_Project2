@@ -25,3 +25,12 @@ find_package(spam_api REQUIRED
 pybind11_add_module(pyspam pyspam.cpp)
 
 target_link_libraries(pyspam PUBLIC jsoncpp_lib spam_api::spam_api)
+
+install(TARGETS pyspam
+    COMPONENT python
+    LIBRARY DESTINATION lib
+)
+
+install(FILES "../install/bin/jsoncpp.dll"
+    DESTINATION lib
+)
