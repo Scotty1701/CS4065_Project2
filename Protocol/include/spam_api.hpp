@@ -1,4 +1,5 @@
 #include <json/json.h>
+#include <map>
 
 namespace spam_api {
 
@@ -49,4 +50,18 @@ std::string getusers(std::string users[]);
 
 } // namespace respond
 } // namespace gen
+
+namespace parse {
+
+namespace request {
+
+std::map<std::string, std::string> connect(std::string& json_message);
+std::map<std::string, std::string> join(std::string& json_message);
+std::map<std::string, std::string> post(std::string& json_message);
+std::map<std::string, std::string> message(std::string& json_message);
+std::map<std::string, std::string> leave(std::string& json_message);
+std::map<std::string, std::string> getusers(std::string& json_message);
+
+} // namespace request
+} // namespace parse
 } // namespace spam_api

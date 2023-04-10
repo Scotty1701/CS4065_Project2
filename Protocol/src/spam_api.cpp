@@ -154,3 +154,71 @@ std::string spam_api::gen::respond::getusers(std::string users[]) {
 
     return output;
 }
+
+std::map<std::string, std::string> spam_api::parse::request::connect(std::string& json_message) {
+    Json::Reader reader;
+    Json::Value message;
+    reader.parse(json_message, message);
+
+    std::map<std::string, std::string> output;
+    output["address"] = message["payload"][0].asString();
+    output["port"] = message["payload"][1].asString();
+
+    return output;
+}
+
+std::map<std::string, std::string> spam_api::parse::request::join(std::string& json_message) {
+    Json::Reader reader;
+    Json::Value message;
+    reader.parse(json_message, message);
+
+    std::map<std::string, std::string> output;
+    output["username"] = message["payload"][0].asString();
+
+    return output;
+}
+
+std::map<std::string, std::string> spam_api::parse::request::post(std::string& json_message) {
+    Json::Reader reader;
+    Json::Value message;
+    reader.parse(json_message, message);
+
+    std::map<std::string, std::string> output;
+    output["message_id"] = message["payload"][0].asString();
+    output["sender"] = message["payload"][1].asString();
+    output["post_date"] = message["payload"][2].asString();
+    output["subject"] = message["payload"][3].asString();
+    output["content"] = message["payload"][4].asString();
+
+    return output;
+}
+
+std::map<std::string, std::string> spam_api::parse::request::message(std::string& json_message) {
+    Json::Reader reader;
+    Json::Value message;
+    reader.parse(json_message, message);
+
+    std::map<std::string, std::string> output;
+    output["message_id"] = message["payload"][0].asString();
+    return output;
+}
+
+std::map<std::string, std::string> spam_api::parse::request::leave(std::string& json_message) {
+    Json::Reader reader;
+    Json::Value message;
+    reader.parse(json_message, message);
+
+    std::map<std::string, std::string> output;
+    output["username"] = message["payload"][0].asString();
+    return output;
+}
+
+std::map<std::string, std::string> spam_api::parse::request::getusers(std::string& json_message) {
+    Json::Reader reader;
+    Json::Value message;
+    reader.parse(json_message, message);
+
+    std::map<std::string, std::string> output;
+    output["group_id"] = message["payload"][0].asString();
+    return output;
+}
