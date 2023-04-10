@@ -3,16 +3,21 @@
 
 
 PYBIND11_MODULE(pyspam, m) {
-    m.def("gen_request_connect", &spam_api::gen_request_connect);
-    m.def("gen_respond_connect", &spam_api::gen_respond_connect);
-    m.def("gen_request_join", &spam_api::gen_request_join);
-    m.def("gen_respond_join", &spam_api::gen_respond_join);
-    m.def("gen_request_post", &spam_api::gen_request_post);
-    m.def("gen_respond_post", &spam_api::gen_respond_post);
-    m.def("gen_request_message", &spam_api::gen_request_message);
-    m.def("gen_respond_message", &spam_api::gen_respond_message);
-    m.def("gen_request_leave", &spam_api::gen_request_leave);
-    m.def("gen_respond_leave", &spam_api::gen_respond_leave);
-    m.def("gen_request_getusers", &spam_api::gen_request_getusers);
-    m.def("gen_respond_getusers", &spam_api::gen_respond_getusers);
+    auto m_gen = m.def_submodule("gen");
+
+    auto m_request = m_gen.def_submodule("request");
+    m_request.def("connect", &spam_api::gen::request::connect);
+    m_request.def("join", &spam_api::gen::request::join);
+    m_request.def("post", &spam_api::gen::request::post);
+    m_request.def("message", &spam_api::gen::request::message);
+    m_request.def("leave", &spam_api::gen::request::leave);
+    m_request.def("getusers", &spam_api::gen::request::getusers);
+
+    auto m_respond = m_gen.def_submodule("respond");
+    m_respond.def("connect", &spam_api::gen::respond::connect);
+    m_respond.def("join", &spam_api::gen::respond::join);
+    m_respond.def("post", &spam_api::gen::respond::post);
+    m_respond.def("message", &spam_api::gen::respond::message);
+    m_respond.def("leave", &spam_api::gen::respond::leave);
+    m_respond.def("getusers", &spam_api::gen::respond::getusers);
 }
