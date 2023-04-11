@@ -312,30 +312,11 @@ std::map<std::string, std::variant<std::string, std::vector<std::string>>> spam_
     std::map<std::string, std::variant<std::string, std::vector<std::string>>> output;
     output["message_type"] = message["message_type"].asString();
     output["is_request"] = message["is_request"].asString();
-    std::vector<std::string> blah;
+    std::vector<std::string> tempList;
     for(int i = 0; i < message["payload"].end() - message["payload"].begin(); i++) {
-        blah.push_back(message["payload"][i].asString());
+        tempList.push_back(message["payload"][i].asString());
     }
-    //{message["payload"].begin(), message["payload"].end()};
-    output["users"] = blah;
-    //output.insert(std::vector<std::string>(message["payload"]));
-
-    //output["users"] = std::vector<std::string>{};
-    //for (auto user : message["payload"]) {
-    //    blah.insert(
-    //}
-    //for (Json::Value::ArrayIndex i = 0; i < message["payload"].size(); i++) {
-
-    //}
-
-    //std::vector<std::string> users{message["payload"]};
-    //output["user"] = std::string{};
-
-    //for (int i = 0; i < message["payload"].size(); i++) {
-    //    output["users"].at(i) = message["payload"][i].asString();
-    //}
-
-    //output["user"] = message["payload"];
+    output["users"] = tempList;
 
     return output;
 }
