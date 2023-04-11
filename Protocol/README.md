@@ -24,3 +24,20 @@ Used to get the content of a message from the server. Request payload contains t
 Used to leave the group. Request payload contains the username of the user leaving as a string `"username"`. Response payload is a bool indicating whether the user successfully left the group.
 ### GetUsers
 Used to get a list of users currently in the group. Request payload contains the group ID as a number `345`. Response payload is a string array of the usernames in the group `{"user1", "user2", "user3"}`. 
+
+## Building
+This project requires cmake to build.
+Starting in the root directory:
+1. `mkdir build`
+1. `cd build`
+1. `cmake ..`
+1. `cmake --build . --config Release`
+1. `cmake --install . --prefix ../install`
+
+To build the python bindings:
+1. `cd python`
+1. `mkdir build`
+1. `cd build`
+1. `cmake ..`
+1. `cmake --build . --config Release`
+1. `cmake --install . --prefix ../install`
