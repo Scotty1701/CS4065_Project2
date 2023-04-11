@@ -1,6 +1,7 @@
 #include <json/json.h>
 #include <vector>
 #include <map>
+#include <variant>
 
 namespace spam_api {
 
@@ -64,5 +65,16 @@ std::map<std::string, std::string> leave(std::string& json_message);
 std::map<std::string, std::string> getusers(std::string& json_message);
 
 } // namespace request
+
+namespace respond {
+
+std::map<std::string, std::string> connect(std::string& json_message);
+std::map<std::string, std::string> join(std::string& json_message);
+std::map<std::string, std::string> post(std::string& json_message);
+std::map<std::string, std::string> message(std::string& json_message);
+std::map<std::string, std::string> leave(std::string& json_message);
+std::map<std::string, std::variant<std::string, std::vector<std::string>>> getusers(std::string& json_message);
+
+} // namespace respond
 } // namespace parse
 } // namespace spam_api
