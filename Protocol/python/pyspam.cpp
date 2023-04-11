@@ -31,4 +31,12 @@ PYBIND11_MODULE(pyspam, m) {
     m_p_request.def("message", &spam_api::parse::request::message);
     m_p_request.def("leave", &spam_api::parse::request::leave);
     m_p_request.def("getusers", &spam_api::parse::request::getusers);
+
+    auto m_p_respond = m_parse.def_submodule("respond");
+    m_p_respond.def("connect", &spam_api::parse::respond::connect);
+    m_p_respond.def("join", &spam_api::parse::respond::join);
+    m_p_respond.def("post", &spam_api::parse::respond::post);
+    m_p_respond.def("message", &spam_api::parse::respond::message);
+    m_p_respond.def("leave", &spam_api::parse::respond::leave);
+    m_p_respond.def("getusers", &spam_api::parse::respond::getusers);
 }
