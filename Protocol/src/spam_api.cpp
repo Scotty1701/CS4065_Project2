@@ -141,13 +141,13 @@ std::string spam_api::gen::request::getusers(std::string group_id) {
     return output;
 }
 
-std::string spam_api::gen::respond::getusers(std::string users[]) {
+std::string spam_api::gen::respond::getusers(std::vector<std::string> users) {
     Json::Value message;
 
-    message["message_type"] = "join";
+    message["message_type"] = "getusers";
     message["is_request"] = false;
-    for (int i = 0; i < users->length(); i++) {
-        message["payload"].append(users->at(i));
+    for (std::string user : users) {
+        message["payload"].append(user);
     }
 
     std::string output = message.toStyledString();

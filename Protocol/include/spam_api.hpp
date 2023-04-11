@@ -1,4 +1,5 @@
 #include <json/json.h>
+#include <vector>
 #include <map>
 
 namespace spam_api {
@@ -46,7 +47,7 @@ std::string message(std::string message_id, std::string sender, std::string post
 std::string leave(bool success);
 
 // Create a message to respond to a getusers request
-std::string getusers(std::string users[]);
+std::string getusers(std::vector<std::string> users);
 
 } // namespace respond
 } // namespace gen
