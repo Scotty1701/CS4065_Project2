@@ -1,0 +1,6 @@
+[tool.setuptools.package-data]
+"*" = ["*.so", "*.dll"]
+
+[project]
+name = "pyspam"
+version = "1.0.0"
