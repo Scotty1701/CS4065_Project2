@@ -15,6 +15,22 @@
         "type": "github"
       }
     },
+    "json-cpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1657835857,
+        "narHash": "sha256-61tMOQp09kenDRLFshRm2Dbt5t5FaGzQ/GtNKTHMTaU=",
+        "owner": "Scotty1701",
+        "repo": "jsoncpp",
+        "rev": "8190e061bc2d95da37479a638aa2c9e483e58ec6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Scotty1701",
+        "repo": "jsoncpp",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1679410443,
@@ -29,10 +45,28 @@
         "type": "indirect"
       }
     },
+    "pybind11": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1680897161,
+        "narHash": "sha256-hqnTxoORAc4lV04y6ti1muwQDH8RG4mhW4Mi5kKSbe0=",
+        "owner": "pybind",
+        "repo": "pybind11",
+        "rev": "ed466da571fbc1d711351eb818e4bf82adb99eca",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pybind",
+        "repo": "pybind11",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "json-cpp": "json-cpp",
+        "nixpkgs": "nixpkgs",
+        "pybind11": "pybind11"
       }
     }
   },
