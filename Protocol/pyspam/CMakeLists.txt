@@ -28,9 +28,22 @@ target_link_libraries(pyspam PUBLIC jsoncpp_lib spam_api::spam_api)
 
 install(TARGETS pyspam
     COMPONENT python
-    LIBRARY DESTINATION lib
+    LIBRARY DESTINATION pyspam
 )
 
-install(FILES "../install/bin/jsoncpp.dll"
-    DESTINATION lib
+if (WIN32)
+  install(FILES "../install/bin/jsoncpp.dll"
+      DESTINATION pyspam
+  )
+endif (WIN32)
+if (UNIX)
+  install(FILES "../install/lib64/libjsoncpp.so"
+      DESTINATION pyspam
+  )
+endif (UNIX)
+install(FILES "./pyproject.toml"
+  DESTINATION .
+)
+install(FILES "./__init__.py"
+  DESTINATION pyspam
 )

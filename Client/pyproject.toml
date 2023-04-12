@@ -1,10 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "client"
-version = "0.0.1"
+version = "1.0.0"
 dependencies = [
-    "requests",
     'importlib-metadata; python_version<"3.8"',
+    'pysimplegui',
+    'rich-click'
 ]
+
 [project.scripts]
-client=client:cli
+client="client:cli"
    
