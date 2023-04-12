@@ -177,7 +177,7 @@ std::map<std::string, std::string> spam_api::parse::request::join(std::string& j
     std::map<std::string, std::string> output;
     output["message_type"] = message["message_type"].asString();
     output["is_request"] = message["is_request"].asString();
-    output["username"] = message["payload"][0].asString();
+    output["username"] = message["payload"].asString();
 
     return output;
 }
@@ -207,7 +207,7 @@ std::map<std::string, std::string> spam_api::parse::request::message(std::string
     std::map<std::string, std::string> output;
     output["message_type"] = message["message_type"].asString();
     output["is_request"] = message["is_request"].asString();
-    output["message_id"] = message["payload"][0].asString();
+    output["message_id"] = message["payload"].asString();
     return output;
 }
 
@@ -219,7 +219,7 @@ std::map<std::string, std::string> spam_api::parse::request::leave(std::string& 
     std::map<std::string, std::string> output;
     output["message_type"] = message["message_type"].asString();
     output["is_request"] = message["is_request"].asString();
-    output["username"] = message["payload"][0].asString();
+    output["username"] = message["payload"].asString();
     return output;
 }
 
@@ -231,7 +231,7 @@ std::map<std::string, std::string> spam_api::parse::request::getusers(std::strin
     std::map<std::string, std::string> output;
     output["message_type"] = message["message_type"].asString();
     output["is_request"] = message["is_request"].asString();
-    output["group_id"] = message["payload"][0].asString();
+    output["group_id"] = message["payload"].asString();
     return output;
 }
 
