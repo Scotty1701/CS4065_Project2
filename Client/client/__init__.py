@@ -10,4 +10,5 @@ from .gui import gui
               "Change the theme to something you like better!" +
               "Pass 'preview' to this flag to view possible themes")
 def cli(theme):
-    gui(theme)
+    g = gui(theme)
+    g.gui_process.join()

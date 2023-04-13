@@ -21,6 +21,7 @@
           pysimplegui
           autopep8
           python-lsp-server
+          kivy
         ] ++ extra_packages);
       in
       rec {
@@ -36,7 +37,7 @@
                 name = "client-1.0.0";
                 src = ./Client;
                 format = "pyproject";
-                propagatedBuildInputs = [ setuptools packages.pyspam rich-click pysimplegui ];
+                propagatedBuildInputs = [ setuptools packages.pyspam rich-click pysimplegui kivy ];
               };
 
             };

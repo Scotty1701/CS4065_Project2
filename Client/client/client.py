@@ -1,6 +1,7 @@
 from threading import Event, Thread
 import socket
 import json
+import pyspam
 
 
 class Client:
