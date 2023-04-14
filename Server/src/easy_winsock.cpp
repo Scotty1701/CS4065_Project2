@@ -86,7 +86,7 @@ int WinsockManager::receive_from_client(SOCKET clientSocket, char buffer[], int 
     return receive_result;
 }
 
-void WinsockManager::send_to_client(SOCKET clientSocket, char buffer[], int bufferLen) {
+void WinsockManager::send_to_client(SOCKET clientSocket, const char buffer[], int bufferLen) {
     int send_result = send(clientSocket, buffer, bufferLen, 0);
 
     if (send_result < 0) {

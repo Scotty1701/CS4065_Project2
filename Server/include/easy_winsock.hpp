@@ -1,3 +1,6 @@
+#ifndef EASY_WINSOCK_HPP
+#define EASY_WINSOCK_HPP
+
 #undef UNICODE
 
 #define WIN32_LEAN_AND_MEAN
@@ -33,7 +36,7 @@ class WinsockManager {
 
         int receive_from_client(SOCKET clientSocket, char buffer[], int bufferLen);
 
-        void send_to_client(SOCKET clientSocket, char buffer[], int bufferLen);
+        void send_to_client(SOCKET clientSocket, const char buffer[], int bufferLen);
 
         int close_connection(SOCKET clientSocket);
 
@@ -41,3 +44,4 @@ class WinsockManager {
 
         void shutdown_winsock();
 };
+#endif
