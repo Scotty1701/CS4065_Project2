@@ -29,6 +29,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
         // Respond appropriately
         if (messageType == "connect") {
+            // Don't need?
         } else if (messageType == "join") {
             std::cout << "Request for join" << std::endl;
             std::string newUsername = std::get<std::string>(fields["username"]);
@@ -49,10 +50,42 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->clientUsernames.push_back(std::get<std::string>(fields["username"]));
             std::string response = spam_api::gen::respond::join(true, "User added");
             server->sendMessage(*client, response);
+
+            // TODO: Let other users know a another user joined
         } else if (messageType == "post") {
+            std::cout << "Request for post" << std::endl;
             // TODO
+            // Where does the message ID get generated?
+
+            // Store the message
+            std::map<std::string, std::string> tempMessage;
+            tempMessage["message_id"] = std::get<std::string>(fields["message_id"]);
+            tempMessage["sender"] = std::get<std::string>(fields["sender"]);
+            tempMessage["post_date"] = std::get<std::string>(fields["post_date"]);
+            tempMessage["subject"] = std::get<std::string>(fields["subject"]);
+            tempMessage["content"] = std::get<std::string>(fields["content"]);
+            server->messages.push_back(tempMessage);
+
+            // Tell the client it was received successfully
+            server->sendMessage(*client, spam_api::gen::respond::post(true, "message posted"));
+
+            // TODO: Notify other users a new message is available
         } else if (messageType == "message") {
-            // TODO
+            std::cout << "Request for message" << std::endl;
+            auto id = std::stoi(std::get<std::string>(fields["message_id"]));
+            if (id >= server->messages.size()) {
+                // Requesting an invalid message id
+                // Send error message
+                auto resp = spam_api::gen::respond::message(false, "invalid message id");
+                server->sendMessage(*client, resp);
+                continue;
+            }
+            auto sender = server->messages.at(id)["sender"];
+            auto post_date = server->messages.at(id)["post_date"];
+            auto subject = server->messages.at(id)["subject"];
+            auto content = server->messages.at(id)["content"];
+            auto resp = spam_api::gen::respond::message(std::to_string(id), sender, post_date, subject, content);
+            server->sendMessage(*client, resp);
         } else if (messageType == "leave") {
             // TODO
         } else if (messageType == "getusers") {

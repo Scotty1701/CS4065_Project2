@@ -24,6 +24,7 @@ class BoardServer {
         WinsockManager sockets;
         std::vector<std::shared_ptr<UserConnection>> clients;
         std::vector<std::string> clientUsernames;
+        std::vector<std::map<std::string, std::string>> messages;
 
         BoardServer(std::string port);
 
