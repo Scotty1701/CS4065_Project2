@@ -36,7 +36,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                 if (newUsername == username) {
                     // Duplicate Username
                     // Send failed join response
-                    std::string response = spam_api::gen::respond::join(false);
+                    std::string response = spam_api::gen::respond::join(false, "Duplicate username");
                     server->sendMessage(*client, response);
                     // TODO: Cleanup this client and close the port
                     // TODO: Return from this thread
@@ -47,7 +47,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
             // Didn't return so username is new, add it to list and respond w/ success
             server->clientUsernames.push_back(std::get<std::string>(fields["username"]));
-            std::string response = spam_api::gen::respond::join(true);
+            std::string response = spam_api::gen::respond::join(true, "User added");
             server->sendMessage(*client, response);
         } else if (messageType == "post") {
             // TODO
@@ -59,7 +59,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             std::cout << "Request for getusers" << std::endl;
             std::string response = spam_api::gen::respond::getusers(server->clientUsernames);
             server->sendMessage(*client, response);
-            return;
         }
     }
 }
