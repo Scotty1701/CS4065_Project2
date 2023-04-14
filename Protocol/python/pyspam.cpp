@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 #include "spam_api.hpp"
 
+namespace py = pybind11;
 
 PYBIND11_MODULE(pyspam, m) {
     auto m_gen = m.def_submodule("gen");
@@ -18,9 +19,11 @@ PYBIND11_MODULE(pyspam, m) {
     m_respond.def("connect", &spam_api::gen::respond::connect);
     m_respond.def("join", &spam_api::gen::respond::join);
     m_respond.def("post", &spam_api::gen::respond::post);
-    m_respond.def("message", &spam_api::gen::respond::message);
+    m_respond.def("message", py::overload_cast<std::string, std::string, std::string, std::string, std::string>(&spam_api::gen::respond::message));
+    m_respond.def("message", py::overload_cast<bool, std::string>(&spam_api::gen::respond::message));
     m_respond.def("leave", &spam_api::gen::respond::leave);
-    m_respond.def("getusers", &spam_api::gen::respond::getusers);
+    m_respond.def("getusers", py::overload_cast<std::vector<std::string>>(&spam_api::gen::respond::getusers));
+    m_respond.def("getusers", py::overload_cast<bool, std::string>(&spam_api::gen::respond::getusers));
 
     m.def("parse", &spam_api::parse);
 }

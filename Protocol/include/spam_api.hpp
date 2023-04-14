@@ -38,22 +38,24 @@ std::string getusers(std::string group_id);
 namespace respond {
 
 // Create a message to respond to a connection request
-std::string connect(bool success);
+std::string connect(bool success, std::string message);
 
 // Create a message to respond to a join request
-std::string join(bool success);
+std::string join(bool success, std::string message);
 
 // Create a message to respond to a post request
-std::string post(bool success);
+std::string post(bool success, std::string message);
 
 // Create a message to respond to a message request
 std::string message(std::string message_id, std::string sender, std::string post_date, std::string subject, std::string content);
+std::string message(bool success, std::string message);
 
 // Create a message to respond to a leave request
-std::string leave(bool success);
+std::string leave(bool success, std::string message);
 
 // Create a message to respond to a getusers request
 std::string getusers(std::vector<std::string> users);
+std::string getusers(bool success, std::string message);
 
 } // namespace respond
 } // namespace gen

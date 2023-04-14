@@ -13,14 +13,15 @@ std::string spam_api::gen::request::connect(std::string address, std::string por
     return output;
 }
 
-std::string spam_api::gen::respond::connect(bool success) {
-    Json::Value message;
+std::string spam_api::gen::respond::connect(bool success, std::string message) {
+    Json::Value response;
 
-    message["message_type"] = "connect";
-    message["is_request"] = false;
-    message["payload"] = success;
+    response["message_type"] = "connect";
+    response["is_request"] = false;
+    response["success"] = success;
+    response["payload"] = message;
 
-    std::string output = message.toStyledString();
+    std::string output = response.toStyledString();
 
     return output;
 }
@@ -37,14 +38,15 @@ std::string spam_api::gen::request::join(std::string username) {
     return output;
 }
 
-std::string spam_api::gen::respond::join(bool success) {
-    Json::Value message;
+std::string spam_api::gen::respond::join(bool success, std::string message) {
+    Json::Value response;
 
-    message["message_type"] = "join";
-    message["is_request"] = false;
-    message["payload"] = success;
+    response["message_type"] = "join";
+    response["is_request"] = false;
+    response["success"] = success;
+    response["payload"] = message;
 
-    std::string output = message.toStyledString();
+    std::string output = response.toStyledString();
 
     return output;
 }
@@ -65,14 +67,15 @@ std::string spam_api::gen::request::post(std::string message_id, std::string sen
     return output;
 }
 
-std::string spam_api::gen::respond::post(bool success) {
-    Json::Value message;
+std::string spam_api::gen::respond::post(bool success, std::string message) {
+    Json::Value response;
 
-    message["message_type"] = "post";
-    message["is_request"] = false;
-    message["payload"] = success;
+    response["message_type"] = "post";
+    response["is_request"] = false;
+    response["success"] = success;
+    response["payload"] = message;
 
-    std::string output = message.toStyledString();
+    std::string output = response.toStyledString();
 
     return output;
 }
@@ -94,6 +97,7 @@ std::string spam_api::gen::respond::message(std::string message_id, std::string 
 
     message["message_type"] = "message";
     message["is_request"] = false;
+    message["success"] = true;
     message["payload"].append(message_id);
     message["payload"].append(sender);
     message["payload"].append(post_date);
@@ -101,6 +105,19 @@ std::string spam_api::gen::respond::message(std::string message_id, std::string 
     message["payload"].append(content);
 
     std::string output = message.toStyledString();
+
+    return output;
+}
+
+std::string spam_api::gen::respond::message(bool success, std::string message) {
+    Json::Value response;
+
+    response["message_type"] = "message";
+    response["is_request"] = false;
+    response["success"] = success;
+    response["payload"] = message;
+
+    std::string output = response.toStyledString();
 
     return output;
 }
@@ -117,14 +134,15 @@ std::string spam_api::gen::request::leave(std::string username) {
     return output;
 }
 
-std::string spam_api::gen::respond::leave(bool success) {
-    Json::Value message;
+std::string spam_api::gen::respond::leave(bool success, std::string message) {
+    Json::Value response;
 
-    message["message_type"] = "leave";
-    message["is_request"] = false;
-    message["payload"] = success;
+    response["message_type"] = "leave";
+    response["is_request"] = false;
+    response["success"] = success;
+    response["payload"] = message;
 
-    std::string output = message.toStyledString();
+    std::string output = response.toStyledString();
 
     return output;
 }
@@ -146,11 +164,25 @@ std::string spam_api::gen::respond::getusers(std::vector<std::string> users) {
 
     message["message_type"] = "getusers";
     message["is_request"] = false;
+    message["success"] = true;
     for (std::string user : users) {
         message["payload"].append(user);
     }
 
     std::string output = message.toStyledString();
+
+    return output;
+}
+
+std::string spam_api::gen::respond::getusers(bool success, std::string message) {
+    Json::Value response;
+
+    response["message_type"] = "getusers";
+    response["is_request"] = false;
+    response["success"] = success;
+    response["payload"] = message;
+
+    std::string output = response.toStyledString();
 
     return output;
 }
@@ -189,25 +221,41 @@ parsedMessage spam_api::parse(std::string& json_message) {
     // Parse responses
     } else {
         if (message_type == "connect") {
-            output["success"] = message["payload"].asString();
+            output["success"] = message["success"].asString();
+            output["payload"] = message["payload"].asString();
         } else if (message_type == "join") {
-            output["success"] = message["payload"].asString();
+            output["success"] = message["success"].asString();
+            output["payload"] = message["payload"].asString();
         } else if (message_type == "post") {
-            output["success"] = message["payload"].asString();
+            output["success"] = message["success"].asString();
+            output["payload"] = message["payload"].asString();
         } else if (message_type == "message") {
-            output["message_id"] = message["payload"][0].asString();
-            output["sender"] = message["payload"][1].asString();
-            output["post_date"] = message["payload"][2].asString();
-            output["subject"] = message["payload"][3].asString();
-            output["content"] = message["payload"][4].asString();
-        } else if (message_type == "leave") {
-            output["success"] = message["payload"].asString();
-        } else if (message_type == "getusers") {
-            std::vector<std::string> tempList;
-            for(int i = 0; i < message["payload"].end() - message["payload"].begin(); i++) {
-                tempList.push_back(message["payload"][i].asString());
+            if (message["success"].asString() == "true") {
+                output["message_id"] = message["payload"][0].asString();
+                output["sender"] = message["payload"][1].asString();
+                output["post_date"] = message["payload"][2].asString();
+                output["subject"] = message["payload"][3].asString();
+                output["content"] = message["payload"][4].asString();
             }
-            output["users"] = tempList;
+            else {
+                output["success"] = message["success"].asString();
+                output["payload"] = message["payload"].asString();
+            }
+        } else if (message_type == "leave") {
+            output["success"] = message["success"].asString();
+            output["payload"] = message["payload"].asString();
+        } else if (message_type == "getusers") {
+            if (message["success"].asString() == "true") {
+                std::vector<std::string> tempList;
+                for(int i = 0; i < message["payload"].end() - message["payload"].begin(); i++) {
+                    tempList.push_back(message["payload"][i].asString());
+                }
+                output["users"] = tempList;
+            }
+            else {
+                output["success"] = message["success"].asString();
+                output["payload"] = message["payload"].asString();
+            }
         }
     }
 
