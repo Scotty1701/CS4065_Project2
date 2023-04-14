@@ -1,7 +1,12 @@
+#ifndef SPAM_API_HPP
+#define SPAM_API_HPP
+
 #include <json/json.h>
 #include <vector>
 #include <map>
 #include <variant>
+
+typedef std::map<std::string, std::variant<std::string, std::vector<std::string>>> parsedMessage;
 
 namespace spam_api {
 
@@ -53,28 +58,8 @@ std::string getusers(std::vector<std::string> users);
 } // namespace respond
 } // namespace gen
 
-namespace parse {
+parsedMessage parse(std::string& json_message);
 
-namespace request {
-
-std::map<std::string, std::string> connect(std::string& json_message);
-std::map<std::string, std::string> join(std::string& json_message);
-std::map<std::string, std::string> post(std::string& json_message);
-std::map<std::string, std::string> message(std::string& json_message);
-std::map<std::string, std::string> leave(std::string& json_message);
-std::map<std::string, std::string> getusers(std::string& json_message);
-
-} // namespace request
-
-namespace respond {
-
-std::map<std::string, std::string> connect(std::string& json_message);
-std::map<std::string, std::string> join(std::string& json_message);
-std::map<std::string, std::string> post(std::string& json_message);
-std::map<std::string, std::string> message(std::string& json_message);
-std::map<std::string, std::string> leave(std::string& json_message);
-std::map<std::string, std::variant<std::string, std::vector<std::string>>> getusers(std::string& json_message);
-
-} // namespace respond
-} // namespace parse
 } // namespace spam_api
+
+#endif

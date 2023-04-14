@@ -155,168 +155,61 @@ std::string spam_api::gen::respond::getusers(std::vector<std::string> users) {
     return output;
 }
 
-std::map<std::string, std::string> spam_api::parse::request::connect(std::string& json_message) {
+parsedMessage spam_api::parse(std::string& json_message) {
     Json::Reader reader;
     Json::Value message;
     reader.parse(json_message, message);
 
-    std::map<std::string, std::string> output;
+    parsedMessage output;
     output["message_type"] = message["message_type"].asString();
     output["is_request"] = message["is_request"].asString();
-    output["address"] = message["payload"][0].asString();
-    output["port"] = message["payload"][1].asString();
 
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::request::join(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["username"] = message["payload"].asString();
-
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::request::post(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["message_id"] = message["payload"][0].asString();
-    output["sender"] = message["payload"][1].asString();
-    output["post_date"] = message["payload"][2].asString();
-    output["subject"] = message["payload"][3].asString();
-    output["content"] = message["payload"][4].asString();
-
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::request::message(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["message_id"] = message["payload"].asString();
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::request::leave(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["username"] = message["payload"].asString();
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::request::getusers(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["group_id"] = message["payload"].asString();
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::respond::connect(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["success"] = message["success"].asString();
-
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::respond::join(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["success"] = message["success"].asString();
-
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::respond::post(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["success"] = message["success"].asString();
-
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::respond::message(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["message_id"] = message["payload"][0].asString();
-    output["sender"] = message["payload"][1].asString();
-    output["post_date"] = message["payload"][2].asString();
-    output["subject"] = message["payload"][3].asString();
-    output["content"] = message["payload"][4].asString();
-
-    return output;
-}
-
-std::map<std::string, std::string> spam_api::parse::respond::leave(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::string> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    output["success"] = message["success"].asString();
-
-    return output;
-}
-
-std::map<std::string, std::variant<std::string, std::vector<std::string>>> spam_api::parse::respond::getusers(std::string& json_message) {
-    Json::Reader reader;
-    Json::Value message;
-    reader.parse(json_message, message);
-
-    std::map<std::string, std::variant<std::string, std::vector<std::string>>> output;
-    output["message_type"] = message["message_type"].asString();
-    output["is_request"] = message["is_request"].asString();
-    std::vector<std::string> tempList;
-    for(int i = 0; i < message["payload"].end() - message["payload"].begin(); i++) {
-        tempList.push_back(message["payload"][i].asString());
+    // Extract the message payload based on its type
+    std::string message_type = std::get<std::string>(output["message_type"]);
+    // Parse requests
+    if (std::get<std::string>(output["is_request"]) == "true") {
+        if (message_type == "connect") {
+            output["address"] = message["payload"][0].asString();
+            output["port"] = message["payload"][1].asString();
+        } else if (message_type == "join") {
+            output["username"] = message["payload"].asString();
+        } else if (message_type == "post") {
+            output["message_id"] = message["payload"][0].asString();
+            output["sender"] = message["payload"][1].asString();
+            output["post_date"] = message["payload"][2].asString();
+            output["subject"] = message["payload"][3].asString();
+            output["content"] = message["payload"][4].asString();
+        } else if (message_type == "message") {
+            output["message_id"] = message["payload"].asString();
+        } else if (message_type == "leave") {
+            output["username"] = message["payload"].asString();
+        } else if (message_type == "getusers") {
+            output["group_id"] = message["payload"].asString();
+        }
+    // Parse responses
+    } else {
+        if (message_type == "connect") {
+            output["success"] = message["payload"].asString();
+        } else if (message_type == "join") {
+            output["success"] = message["payload"].asString();
+        } else if (message_type == "post") {
+            output["success"] = message["payload"].asString();
+        } else if (message_type == "message") {
+            output["message_id"] = message["payload"][0].asString();
+            output["sender"] = message["payload"][1].asString();
+            output["post_date"] = message["payload"][2].asString();
+            output["subject"] = message["payload"][3].asString();
+            output["content"] = message["payload"][4].asString();
+        } else if (message_type == "leave") {
+            output["success"] = message["payload"].asString();
+        } else if (message_type == "getusers") {
+            std::vector<std::string> tempList;
+            for(int i = 0; i < message["payload"].end() - message["payload"].begin(); i++) {
+                tempList.push_back(message["payload"][i].asString());
+            }
+            output["users"] = tempList;
+        }
     }
-    output["users"] = tempList;
 
     return output;
 }
