@@ -52,7 +52,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->sendMessage(*client, response);
             client->name = std::get<std::string>(fields["username"]);
 
-            // TODO: Let other users know a another user joined
+            // Let other users know a another user joined
             std::cout << "Yo new client just dropped" << std::endl;
             for (int i = 0; i < server->clientUsernames.size(); i++) {
                 if (server->clients.at(i)->name != client->name) {
@@ -61,7 +61,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                     server->sendMessage(*server->clients.at(i), response);
                 }
             }
-            // TODO: Inform client of last 2 messages posted
+            // Inform client of last 2 messages posted
             std::cout << "sending previous messages" << std::endl;
             std::cout << server->messages.size() << std::endl;
             for (int i = server->messages.size();
@@ -109,7 +109,24 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             auto resp = spam_api::gen::respond::message(std::to_string(id), sender, post_date, subject, content);
             server->sendMessage(*client, resp);
         } else if (messageType == "leave") {
-            // TODO
+            auto resp = spam_api::gen::respond::leave(true, client->name);
+            server->sendMessage(*client, resp);
+            // Remove the client from the server's lists
+            for (int i = 0; i < server->clientUsernames.size(); i++) {
+                if (server->clientUsernames.at(i) == client->name) {
+                    server->clientUsernames.erase(server->clientUsernames.begin()+i);
+                }
+                if (server->clients.at(i)->name == client->name) {
+                    server->clients.erase(server->clients.begin()+i);
+                }
+            }
+            // Update the other users on the change
+            for (int i = 0; i < server->clientUsernames.size(); i++) {
+                std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
+                std::string response = spam_api::gen::respond::getusers(server->clientUsernames);
+                server->sendMessage(*server->clients.at(i), response);
+            }
+            return;
         } else if (messageType == "getusers") {
             std::cout << "Request for getusers" << std::endl;
             std::string response = spam_api::gen::respond::getusers(server->clientUsernames);
