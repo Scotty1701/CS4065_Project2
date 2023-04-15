@@ -52,14 +52,13 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->sendMessage(*client, response);
 
             // TODO: Let other users know a another user joined
+            // TODO: Inform client of last 2 messages posted
         } else if (messageType == "post") {
             std::cout << "Request for post" << std::endl;
-            // TODO
-            // Where does the message ID get generated?
-
             // Store the message
             std::map<std::string, std::string> tempMessage;
-            tempMessage["message_id"] = std::get<std::string>(fields["message_id"]);
+            //tempMessage["message_id"] = std::get<std::string>(fields["message_id"]);
+            tempMessage["message_id"] = std::to_string(server->messages.size());
             tempMessage["sender"] = std::get<std::string>(fields["sender"]);
             tempMessage["post_date"] = std::get<std::string>(fields["post_date"]);
             tempMessage["subject"] = std::get<std::string>(fields["subject"]);
@@ -67,7 +66,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->messages.push_back(tempMessage);
 
             // Tell the client it was received successfully
-            server->sendMessage(*client, spam_api::gen::respond::post(true, "message posted"));
+            server->sendMessage(*client, spam_api::gen::respond::post(true, tempMessage["message_id"]));
 
             // TODO: Notify other users a new message is available
         } else if (messageType == "message") {
