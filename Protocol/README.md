@@ -13,17 +13,17 @@ The protocol simply consists of a JSON formatted message with three fields: the 
 
 ## Message Types
 ### Connect
-Used to connect to a server. Request payload contains the address and port of the server, formatted as a string `{"address", "port"}`. Response payload is a bool indicating whether the connection was accepted.
+Used to connect to a server. Request payload contains the address and port of the server, formatted as a string `{"address", "port"}`. Response payload is a bool indicating whether the connection was accepted and an error message if unsuccessful.
 ### Join
-Used to join the message board. Request payload contains the desired username as a string `"username"`. Response payload is a bool indicating whether the user was added to the board.
+Used to join the message board. Request payload contains the desired username as a string `"username"`. Response payload is a bool indicating whether the user was added to the board and an error message if unsuccessful.
 ### Post
-Used to post a new message to the board. Request payload contains the following information formatted as follows a string array `{"message_id", "sender", "post_date", "subject", "content"}`. Response payload is a bool indicating whether the message was posted to the board.
+Used to post a new message to the board. Request payload contains the following information formatted as follows a string array `{"message_id", "sender", "post_date", "subject", "content"}`. Response payload is a bool indicating whether the message was posted to the board and an error message if unsuccessful.
 ### Message
-Used to get the content of a message from the server. Request payload contains the message ID of the desired message as a number `123`. Response payload is a string matching the payload format for the post request, `{"message_id", "sender", "post_date", "subject", "content"}`.
+Used to get the content of a message from the server. Request payload contains the message ID of the desired message as a number `123`. If the requested message is found, response payload is a string matching the payload format for the post request, `{"message_id", "sender", "post_date", "subject", "content"}`, otherwise an unsuccessful response and error message is returned.
 ### Leave
-Used to leave the group. Request payload contains the username of the user leaving as a string `"username"`. Response payload is a bool indicating whether the user successfully left the group.
+Used to leave the group. Request payload contains the username of the user leaving as a string `"username"`. Response payload is a bool indicating whether the user successfully left the group and an error message if unsuccessful.
 ### GetUsers
-Used to get a list of users currently in the group. Request payload contains the group ID as a number `345`. Response payload is a string array of the usernames in the group `{"user1", "user2", "user3"}`. 
+Used to get a list of users currently in the group. Request payload contains the group ID as a number `345`. If the requested group is found, response payload is a string array of the usernames in the group `{"user1", "user2", "user3"}`, otherwise an unsuccessful response and error message is returned. 
 
 ## Building
 This project requires cmake to build.
