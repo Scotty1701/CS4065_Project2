@@ -51,12 +51,11 @@ std::string spam_api::gen::respond::join(bool success, std::string message) {
     return output;
 }
 
-std::string spam_api::gen::request::post(std::string message_id, std::string sender, std::string post_date, std::string subject, std::string content) {
+std::string spam_api::gen::request::post(std::string sender, std::string post_date, std::string subject, std::string content) {
     Json::Value message;
 
     message["message_type"] = "post";
     message["is_request"] = true;
-    message["payload"].append(message_id);
     message["payload"].append(sender);
     message["payload"].append(post_date);
     message["payload"].append(subject);
@@ -73,7 +72,7 @@ std::string spam_api::gen::respond::post(bool success, std::string message) {
     response["message_type"] = "post";
     response["is_request"] = false;
     response["success"] = success;
-    response["payload"] = message;
+    response["payload"] = message; // Message ID if successful, error message otherwise
 
     std::string output = response.toStyledString();
 

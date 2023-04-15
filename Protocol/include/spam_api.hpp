@@ -22,7 +22,7 @@ std::string connect(std::string address, std::string port);
 std::string join(std::string username);
 
 // Create a message to post a new message to the board
-std::string post(std::string message_id, std::string sender, std::string post_date, std::string subject, std::string content);
+std::string post(std::string sender, std::string post_date, std::string subject, std::string content);
 
 // Create a message to request a posted message
 std::string message(std::string requested_message_id);
