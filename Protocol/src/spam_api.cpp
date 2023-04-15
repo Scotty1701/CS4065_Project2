@@ -205,11 +205,10 @@ parsedMessage spam_api::parse(std::string& json_message) {
         } else if (message_type == "join") {
             output["username"] = message["payload"].asString();
         } else if (message_type == "post") {
-            output["message_id"] = message["payload"][0].asString();
-            output["sender"] = message["payload"][1].asString();
-            output["post_date"] = message["payload"][2].asString();
-            output["subject"] = message["payload"][3].asString();
-            output["content"] = message["payload"][4].asString();
+            output["sender"] = message["payload"][0].asString();
+            output["post_date"] = message["payload"][1].asString();
+            output["subject"] = message["payload"][2].asString();
+            output["content"] = message["payload"][3].asString();
         } else if (message_type == "message") {
             output["message_id"] = message["payload"].asString();
         } else if (message_type == "leave") {
