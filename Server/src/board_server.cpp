@@ -53,6 +53,20 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
             // TODO: Let other users know a another user joined
             // TODO: Inform client of last 2 messages posted
+            std::cout << "sending previous messages" << std::endl;
+            std::cout << server->messages.size() << std::endl;
+            for (int i = server->messages.size();
+                 (i > server->messages.size()-2) || (i > 0);
+                 i--) {
+                auto sender = server->messages.at(i-1)["sender"];
+                auto post_date = server->messages.at(i-1)["post_date"];
+                auto subject = server->messages.at(i-1)["subject"];
+                auto content = server->messages.at(i-1)["content"];
+                auto resp = spam_api::gen::respond::message(std::to_string(i-1), sender, post_date, subject, content);
+                server->sendMessage(*client, resp);
+                std::cout << std::to_string(i) << std::endl;
+                std::cout << subject << ", " << content << std::endl;
+            }
         } else if (messageType == "post") {
             std::cout << "Request for post" << std::endl;
             // Store the message
