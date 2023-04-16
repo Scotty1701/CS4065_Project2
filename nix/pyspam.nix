@@ -51,7 +51,7 @@ in
   };
 
   server = with pkgs; stdenv.mkDerivation rec {
-    name = "server";
+    name = "board_server";
     src = ../Server;
     nativeBuildInputs = [ cmake spam_api ];
     cmakeFlags = [
