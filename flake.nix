@@ -38,10 +38,16 @@
                 name = "client-1.0.0";
                 src = ./Client;
                 format = "pyproject";
-                propagatedBuildInputs = [ setuptools packages.pyspam rich-click pysimplegui kivy ];
+                propagatedBuildInputs = [ setuptools packages.pyspam rich-click pysimplegui kivy textual ];
               };
 
             };
+        apps = {
+          client  =  with pkgs; {
+            type = "app";
+            program = "${packages.client}/bin/client";
+          };
+        };
         devShells = flake-utils.lib.flattenTree {
           default = with pkgs; mkShell {
             packages = [ (mkpython [ packages.pyspam packages.client ]) ];

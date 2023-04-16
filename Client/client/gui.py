@@ -6,7 +6,6 @@ from .client import Client
 class gui:
 
     def __init__(self, theme):
-        self.client = Client()
         # set of groups, each containing a list of messages
         self.groups = {}
         self.current_group = None
@@ -85,7 +84,11 @@ class gui:
         self.__start_gui()
 
     def __start_gui(self):
+        # TODO group joining
+        self.current_group = "main"
+
         self.window = sg.Window('Window Title', self.layout, resizable=True)
+        self.client = Client(self.window.write_event_value)
         self.username = None
         while True:
             self.__event_loop()
@@ -107,14 +110,16 @@ class gui:
             self.client.connect(values["address"])
 
     def create_message(self, username, message):
-        self.window["messages"].print(
-            "",
-            username,
-            text_color=self.colors["TEXT"],
-            justification="c",
-            background_color=self.colors["TEXT_INPUT"],
-            end="\n")
-        self.groups[self.current_group].append((username, message))
+        self.window["messages"].print("",
+                                      username,
+                                      text_color=self.colors["TEXT_INPUT"],
+                                      justification="c",
+                                      background_color=self.colors["INPUT"],
+                                      end="\n")
+        if self.current_group in self.groups:
+            self.groups[self.current_group].append((username, message))
+        else:
+            self.groups[self.current_group] = [(username, message)]
         self.window["messages"].print("",
                                       message,
                                       text_color=self.colors["TEXT"],

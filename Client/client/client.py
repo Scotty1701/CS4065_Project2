@@ -1,7 +1,7 @@
 from threading import Event, Thread
 import socket
 import json
-
+import time
 import re
 
 
@@ -16,13 +16,15 @@ def threaded(func):
 class Client:
     left_bracket = re.compile(r"{")
     right_bracket = re.compile(r"}")
+    command_list = ["connect", "join", "help"]
 
     def __init__(self, write_event):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.write_event()
+        self.write_event = write_event
 
     def connect(self, address: str, port: str):
-        self.server_socket.connect((address, port))
+        """ connect address port """
+        self.server_socket.connect((address, int(port)))
 
     @threaded
     def recieve(self):
@@ -40,3 +42,6 @@ class Client:
     def join(self, username: str, groupname: str = "public"):
         message = username
         self.server_socket.sendall(message)
+
+    def help(self, command):
+        print(getattr(self, command).__doc__)
