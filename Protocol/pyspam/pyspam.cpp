@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 #include "spam_api.hpp"
 
+namespace py = pybind11;
 
 PYBIND11_MODULE(pyspam, m) {
     auto m_gen = m.def_submodule("gen");
@@ -18,25 +19,11 @@ PYBIND11_MODULE(pyspam, m) {
     m_respond.def("connect", &spam_api::gen::respond::connect);
     m_respond.def("join", &spam_api::gen::respond::join);
     m_respond.def("post", &spam_api::gen::respond::post);
-    m_respond.def("message", &spam_api::gen::respond::message);
+    m_respond.def("message", py::overload_cast<std::string, std::string, std::string, std::string, std::string>(&spam_api::gen::respond::message));
+    m_respond.def("message", py::overload_cast<bool, std::string>(&spam_api::gen::respond::message));
     m_respond.def("leave", &spam_api::gen::respond::leave);
-    m_respond.def("getusers", &spam_api::gen::respond::getusers);
+    m_respond.def("getusers", py::overload_cast<std::vector<std::string>>(&spam_api::gen::respond::getusers));
+    m_respond.def("getusers", py::overload_cast<bool, std::string>(&spam_api::gen::respond::getusers));
 
-    auto m_parse = m.def_submodule("parse");
-
-    auto m_p_request = m_parse.def_submodule("request");
-    m_p_request.def("connect", &spam_api::parse::request::connect);
-    m_p_request.def("join", &spam_api::parse::request::join);
-    m_p_request.def("post", &spam_api::parse::request::post);
-    m_p_request.def("message", &spam_api::parse::request::message);
-    m_p_request.def("leave", &spam_api::parse::request::leave);
-    m_p_request.def("getusers", &spam_api::parse::request::getusers);
-
-    auto m_p_respond = m_parse.def_submodule("respond");
-    m_p_respond.def("connect", &spam_api::parse::respond::connect);
-    m_p_respond.def("join", &spam_api::parse::respond::join);
-    m_p_respond.def("post", &spam_api::parse::respond::post);
-    m_p_respond.def("message", &spam_api::parse::respond::message);
-    m_p_respond.def("leave", &spam_api::parse::respond::leave);
-    m_p_respond.def("getusers", &spam_api::parse::respond::getusers);
+    m.def("parse", &spam_api::parse);
 }

@@ -17,6 +17,8 @@ The protocol simply consists of a JSON formatted message with three fields: the 
 
 ### Connect
 
+<<<<<<< HEAD
+
 Used to connect to a server. Request payload contains the address and port of the server, formatted as a string `{"address", "port"}`. Response payload is a bool indicating whether the connection was accepted.
 
 ### Join
