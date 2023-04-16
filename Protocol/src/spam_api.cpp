@@ -26,12 +26,13 @@ std::string spam_api::gen::respond::connect(bool success, std::string message) {
     return output;
 }
 
-std::string spam_api::gen::request::join(std::string username) {
+std::string spam_api::gen::request::join(std::string username, std::string group_id) {
     Json::Value message;
 
     message["message_type"] = "join";
     message["is_request"] = true;
-    message["payload"] = username;
+    message["payload"].append(username);
+    message["payload"].append(group_id);
 
     std::string output = message.toStyledString();
 
@@ -51,11 +52,12 @@ std::string spam_api::gen::respond::join(bool success, std::string message) {
     return output;
 }
 
-std::string spam_api::gen::request::post(std::string sender, std::string post_date, std::string subject, std::string content) {
+std::string spam_api::gen::request::post(std::string group_id, std::string sender, std::string post_date, std::string subject, std::string content) {
     Json::Value message;
 
     message["message_type"] = "post";
     message["is_request"] = true;
+    message["payload"].append(group_id);
     message["payload"].append(sender);
     message["payload"].append(post_date);
     message["payload"].append(subject);
@@ -79,25 +81,27 @@ std::string spam_api::gen::respond::post(bool success, std::string message) {
     return output;
 }
 
-std::string spam_api::gen::request::message(std::string message_id) {
+std::string spam_api::gen::request::message(std::string group_id, std::string message_id) {
     Json::Value message;
 
     message["message_type"] = "message";
     message["is_request"] = true;
-    message["payload"] = message_id;
+    message["payload"].append(group_id);
+    message["payload"].append(message_id);
 
     std::string output = message.toStyledString();
 
     return output;
 }
 
-std::string spam_api::gen::respond::message(std::string message_id, std::string sender, std::string post_date, std::string subject, std::string content) {
+std::string spam_api::gen::respond::message(std::string message_id, std::string group_id, std::string sender, std::string post_date, std::string subject, std::string content) {
     Json::Value message;
 
     message["message_type"] = "message";
     message["is_request"] = false;
     message["success"] = true;
     message["payload"].append(message_id);
+    message["payload"].append(group_id);
     message["payload"].append(sender);
     message["payload"].append(post_date);
     message["payload"].append(subject);
@@ -121,12 +125,12 @@ std::string spam_api::gen::respond::message(bool success, std::string message) {
     return output;
 }
 
-std::string spam_api::gen::request::leave(std::string username) {
+std::string spam_api::gen::request::leave(std::string group_id) {
     Json::Value message;
 
     message["message_type"] = "leave";
     message["is_request"] = true;
-    message["payload"] = username;
+    message["payload"] = group_id;
 
     std::string output = message.toStyledString();
 
@@ -177,6 +181,45 @@ std::string spam_api::gen::respond::getusers(bool success, std::string message) 
     Json::Value response;
 
     response["message_type"] = "getusers";
+    response["is_request"] = false;
+    response["success"] = success;
+    response["payload"] = message;
+
+    std::string output = response.toStyledString();
+
+    return output;
+}
+
+std::string spam_api::gen::request::getgroups() {
+    Json::Value request;
+
+    request["message_type"] = "getgroups";
+    request["is_request"] = true;
+
+    std::string output = request.toStyledString();
+
+    return output;
+}
+
+std::string spam_api::gen::respond::getgroups(std::vector<std::string> groups) {
+    Json::Value message;
+
+    message["message_type"] = "getgroups";
+    message["is_request"] = false;
+    message["success"] = true;
+    for (std::string group : groups) {
+        message["payload"].append(group);
+    }
+
+    std::string output = message.toStyledString();
+
+    return output;
+}
+
+std::string spam_api::gen::respond::getgroups(bool success, std::string message) {
+    Json::Value response;
+
+    response["message_type"] = "getgroups";
     response["is_request"] = false;
     response["success"] = success;
     response["payload"] = message;
