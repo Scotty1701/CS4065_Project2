@@ -1,5 +1,6 @@
 #include "easy_winsock.hpp"
 
+
 WinsockManager::WinsockManager() {
     listenSocket = INVALID_SOCKET;
     result = NULL;
@@ -14,20 +15,24 @@ WinsockManager::WinsockManager() {
 SOCKET WinsockManager::get_client_socket(int index) {
     return clientSockets.at(index);
 }
-
 int WinsockManager::init_winsock(std::string port) {
-    int startup_result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    #if _WIN32
+      int startup_result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    #else
+      int startup_result = 0;
+    #endif
 
     if (startup_result != 0) {
         std::string message = "WSAStartup failed with error: " + std::to_string(startup_result);
-        throw std::exception(message.c_str());
+        typedef std::runtime_error exception;
+        throw exception(message.c_str());
     }
 
     int get_addr_info_result = getaddrinfo(NULL, port.c_str(), &hints, &result);
 
     if (get_addr_info_result != 0) {
         std::string message = "getaddrinfo failed with error: " + std::to_string(get_addr_info_result);
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
 
     return get_addr_info_result;
@@ -40,7 +45,7 @@ int WinsockManager::create_listener() {
         std::string message = "Socket failed with error: " + std::to_string(WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
 
     int bind_result = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
@@ -50,14 +55,14 @@ int WinsockManager::create_listener() {
         freeaddrinfo(result);
         closesocket(listenSocket);
         WSACleanup();
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
 
     int listen_result = listen(listenSocket, SOMAXCONN);
 
     if (listen_result == SOCKET_ERROR) {
         std::string message = "Listen failed with error: " + std::to_string(WSAGetLastError());
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
 
     return listen_result;
@@ -68,7 +73,7 @@ int WinsockManager::accept_client() {
 
     if (tempSocket == INVALID_SOCKET) {
         std::string message = "Accept failed with error: " + std::to_string(WSAGetLastError());
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
 
     clientSockets.push_back(tempSocket);
@@ -80,7 +85,7 @@ int WinsockManager::receive_from_client(SOCKET clientSocket, char buffer[], int 
 
     if (receive_result < 0) {
         std::string message = "Recv failed with error: " + std::to_string(WSAGetLastError());
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
 
     return receive_result;
@@ -91,7 +96,7 @@ void WinsockManager::send_to_client(SOCKET clientSocket, const char buffer[], in
 
     if (send_result < 0) {
         std::string message = "Send failed with error: " + std::to_string(WSAGetLastError());
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
 }
 
@@ -100,7 +105,7 @@ int WinsockManager::close_connection(SOCKET clientSocket) {
 
     if (close_result == SOCKET_ERROR) {
         std::string message = "Shutdown failed with error: " + std::to_string(WSAGetLastError());
-        throw std::exception(message.c_str());
+        throw exception(message.c_str());
     }
     closesocket(clientSocket);
 
@@ -114,5 +119,5 @@ void WinsockManager::close_all_connections() {
 }
 
 void WinsockManager::shutdown_winsock() {
-    WSACleanup();
+  WSACleanup();
 }

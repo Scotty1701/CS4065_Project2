@@ -32,7 +32,8 @@
           in
           flake-utils.lib.flattenTree
             {
-              pyspam = pyspamDerivation;
+              pyspam = pyspamDerivation.pyspam;
+              server = pyspamDerivation.server;
               client = with pkgs.python3.pkgs; buildPythonPackage {
                 name = "client-1.0.0";
                 src = ./Client;

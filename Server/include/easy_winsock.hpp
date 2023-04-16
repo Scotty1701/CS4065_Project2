@@ -5,21 +5,46 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#ifdef _WIND32
 #include <windows.h>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+typedef std::exception exception;
+#pragma comment (lib, "Ws2_32.lib")
+#else
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <cstring>
+#include <errno.h>
+#include <stdexcept>
+#define ZeroMemory(Destination, Length) memset((Destination),0,(Length))
+
+typedef int SOCKET;
+typedef std::runtime_error exception;
+const auto closesocket = close;
+const auto WSACleanup = []{return 0;};
+const auto WSAGetLastError = []{return errno;};
+typedef std::runtime_error exception;
+const int SOCKET_ERROR = -1;
+const int INVALID_SOCKET = -1;
+const int SD_SEND = 1;
+
+#endif
 #include <stdlib.h>
 #include <string>
 #include <vector>
 
 // Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
 
 class WinsockManager {
     private:
         SOCKET listenSocket;
         std::vector<SOCKET> clientSockets;
-        WSADATA wsaData;
+        #ifdef _WIN32
+          WSADATA wsaData;
+        #endif
         struct addrinfo* result;
         struct addrinfo hints;
 
@@ -44,4 +69,5 @@ class WinsockManager {
 
         void shutdown_winsock();
 };
+
 #endif
