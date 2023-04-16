@@ -246,18 +246,23 @@ parsedMessage spam_api::parse(std::string& json_message) {
             output["address"] = message["payload"][0].asString();
             output["port"] = message["payload"][1].asString();
         } else if (message_type == "join") {
-            output["username"] = message["payload"].asString();
+            output["username"] = message["payload"][0].asString();
+            output["group_id"] = message["payload"][1].asString();
         } else if (message_type == "post") {
-            output["sender"] = message["payload"][0].asString();
-            output["post_date"] = message["payload"][1].asString();
-            output["subject"] = message["payload"][2].asString();
-            output["content"] = message["payload"][3].asString();
+            output["group_id"] = message["payload"][0].asString();
+            output["sender"] = message["payload"][1].asString();
+            output["post_date"] = message["payload"][2].asString();
+            output["subject"] = message["payload"][3].asString();
+            output["content"] = message["payload"][4].asString();
         } else if (message_type == "message") {
-            output["message_id"] = message["payload"].asString();
+            output["group_id"] = message["payload"][0].asString();
+            output["message_id"] = message["payload"][1].asString();
         } else if (message_type == "leave") {
-            output["username"] = message["payload"].asString();
+            output["group_id"] = message["payload"].asString();
         } else if (message_type == "getusers") {
             output["group_id"] = message["payload"].asString();
+        } else if (message_type == "getgroups") {
+            // No payload
         }
     // Parse responses
     } else {
@@ -273,10 +278,11 @@ parsedMessage spam_api::parse(std::string& json_message) {
         } else if (message_type == "message") {
             if (message["success"].asString() == "true") {
                 output["message_id"] = message["payload"][0].asString();
-                output["sender"] = message["payload"][1].asString();
-                output["post_date"] = message["payload"][2].asString();
-                output["subject"] = message["payload"][3].asString();
-                output["content"] = message["payload"][4].asString();
+                output["group_id"] = message["payload"][1].asString();
+                output["sender"] = message["payload"][2].asString();
+                output["post_date"] = message["payload"][3].asString();
+                output["subject"] = message["payload"][4].asString();
+                output["content"] = message["payload"][5].asString();
             }
             else {
                 output["success"] = message["success"].asString();
@@ -292,6 +298,18 @@ parsedMessage spam_api::parse(std::string& json_message) {
                     tempList.push_back(message["payload"][i].asString());
                 }
                 output["users"] = tempList;
+            }
+            else {
+                output["success"] = message["success"].asString();
+                output["payload"] = message["payload"].asString();
+            }
+        } else if (message_type == "getgroups") {
+            if (message["success"].asString() == "true") {
+                std::vector<std::string> tempList;
+                for(int i = 0; i < message["payload"].end() - message["payload"].begin(); i++) {
+                    tempList.push_back(message["payload"][i].asString());
+                }
+                output["groups"] = tempList;
             }
             else {
                 output["success"] = message["success"].asString();
