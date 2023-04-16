@@ -1,12 +1,15 @@
 import PySimpleGUI as sg
 from threading import Thread, Event
+from .client import Client
 
 
 class gui:
 
     def __init__(self, theme):
+        self.client = Client()
         # set of groups, each containing a list of messages
-        groups = {}
+        self.groups = {}
+        self.current_group = None
 
         # display theme preview
         if theme == "preview":
@@ -45,7 +48,6 @@ class gui:
             [sg.Button("Send")]],
             expand_x=True,
             expand_y=True)
-
         groups = sg.Column([
             [
                 sg.Text("Server Address"),
@@ -55,8 +57,18 @@ class gui:
              sg.InputText(key="username", size=(20, 0))],
             [sg.Button("Connect")],
             [
-                sg.Frame(
-                    title="Groups", layout=[[]], expand_x=True, expand_y=True)
+                sg.Frame(title="Groups",
+                         layout=[[
+                             sg.Listbox(self.groups,
+                                        expand_x=True,
+                                        expand_y=True,
+                                        no_scrollbar=True,
+                                        enable_events=True,
+                                        pad=5,
+                                        key="groups")
+                         ]],
+                         expand_x=True,
+                         expand_y=True)
             ],
         ],
             expand_x=True,
@@ -76,20 +88,23 @@ class gui:
         self.window = sg.Window('Window Title', self.layout, resizable=True)
         self.username = None
         while True:
-            # event loop
-            event, values = self.window.read()
-            if event == sg.WIN_CLOSED:
-                break
-            if event == "Send":
-                message = values["message"]
-                self.window["message"]("")
-                if self.username:
-                    self.create_message(self.username, message)
-                else:
-                    print("no username")
-            if event == "Connect":
-                self.username = values["username"]
+            self.__event_loop()
         self.window.close()
+
+    def __event_loop(self):
+        event, values = self.window.read()
+        if event == sg.WIN_CLOSED:
+            return
+        if event == "Send":
+            message = values["message"]
+            self.window["message"]("")
+            if self.username and self.current_group:
+                self.create_message(self.username, message)
+            else:
+                print("no username")
+        if event == "Connect":
+            self.username = values["username"]
+            self.client.connect(values["address"])
 
     def create_message(self, username, message):
         self.window["messages"].print(
@@ -99,10 +114,14 @@ class gui:
             justification="c",
             background_color=self.colors["TEXT_INPUT"],
             end="\n")
+        self.groups[self.current_group].append((username, message))
         self.window["messages"].print("",
                                       message,
                                       text_color=self.colors["TEXT"],
                                       end="\n\n")
+
+    def listen(self, command):
+        Thread(target=getattr(client, command))
 
 
 if __name__ == "__main__":

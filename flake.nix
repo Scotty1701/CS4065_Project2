@@ -21,7 +21,7 @@
           pysimplegui
           autopep8
           python-lsp-server
-          kivy
+          textual
         ] ++ extra_packages);
       in
       rec {

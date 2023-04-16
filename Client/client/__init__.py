@@ -1,14 +1,23 @@
 import rich_click as click
-from .gui import gui
+from .gui import gui as G
+from .tui import tui as T
+
+# @click.group()
+# def cli():
+#    pass
+#
+#
+# @cli.command(help="You can start the cli by not passing the --help flag!")
 
 
-@click.command(
-    help="Hi there! You can start the gui by not passing the --help flag!")
-@click.option("--theme",
-              default="DarkGreen2",
-              help="colors got you down?" +
-              "Change the theme to something you like better!" +
-              "Pass 'preview' to this flag to view possible themes")
-def cli(theme):
-    g = gui(theme)
-    g.gui_process.join()
+@click.group()
+@click.option('--debug/--no-debug', default=False)
+def cli(debug):
+    click.echo(f"Debug mode is {'on' if debug else 'off'}")
+
+
+@cli.command()  # @cli, not @click!
+def tui():
+    click.echo('Syncing')
+    c = T()
+    c.run()
