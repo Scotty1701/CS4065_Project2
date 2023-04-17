@@ -125,8 +125,9 @@ class gui:
                                       text_color=self.colors["TEXT"],
                                       end="\n\n")
 
-    def listen(self, command):
-        Thread(target=getattr(client, command))
+    def listen(self, command=None):
+        if command:
+            Thread(target=getattr(client, command))
 
 
 if __name__ == "__main__":

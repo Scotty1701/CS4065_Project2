@@ -51,7 +51,7 @@ in
   };
 
   server = with pkgs; stdenv.mkDerivation rec {
-    name = "board_server";
+    name = "server";
     src = ../Server;
     nativeBuildInputs = [ cmake spam_api ];
     cmakeFlags = [
@@ -67,6 +67,7 @@ in
     '';
     installPhase = ''
       cmake --install . --prefix $out
+      mv $out/bin/board_server $out/bin/server
     '';
   };
 }

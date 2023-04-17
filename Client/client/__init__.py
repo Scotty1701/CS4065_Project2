@@ -1,6 +1,5 @@
 import rich_click as click
 from .gui import gui as G
-from .tui import tui as T
 from .cli import CLI
 
 # @click.group()
@@ -21,13 +20,6 @@ def cli(debug):
 @click.option('--theme', default="Dark Green")
 def gui(theme):
     g = G(theme)
-
-
-@cli.command()
-def tui():
-    click.echo('Syncing')
-    c = T()
-    c.run()
 
 
 @cli.command(name="cli")

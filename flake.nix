@@ -38,12 +38,25 @@
                 name = "client-1.0.0";
                 src = ./Client;
                 format = "pyproject";
-                propagatedBuildInputs = [ setuptools packages.pyspam rich-click pysimplegui kivy textual ];
+                propagatedBuildInputs = [ setuptools packages.pyspam rich-click pysimplegui kivy rich getkey ];
+              };
+              docker = with pkgs; dockerTools.buildImage {
+                name = "CSProject";
+                tag = "latest";
+
+                copyToRoot = buildEnv {
+                  name = "image-root";
+                  paths = [ packages.client packages.server bashInteractive coreutils ];
+                  pathsToLink = [ "/bin" ];
+                };
+                config = {
+                  Cmd = [ "${bashInteractive}/bin/bash" ];
+                };
               };
 
             };
         apps = {
-          client  =  with pkgs; {
+          client = with pkgs; {
             type = "app";
             program = "${packages.client}/bin/client";
           };

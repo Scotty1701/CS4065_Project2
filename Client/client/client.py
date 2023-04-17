@@ -4,6 +4,8 @@ import json
 import time
 import re
 
+event_list = ["log", "group", "message"]
+
 
 def threaded(func):
 
@@ -43,5 +45,11 @@ class Client:
         message = username
         self.server_socket.sendall(message)
 
-    def help(self, command):
-        print(getattr(self, command).__doc__)
+    def help(self, command=None):
+        if command:
+            self.write_event("log", getattr(self, command).__doc__)
+            return
+        self.write_event("log", f"Available commands:{self.command_list}")
+        import time
+        time.sleep(1)
+        self.write_event("message", ["hi", "world"])
