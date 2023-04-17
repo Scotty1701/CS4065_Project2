@@ -128,6 +128,7 @@ class gui:
     def listen(self, command=None):
         if command:
             Thread(target=getattr(client, command))
+            return
 
 
 if __name__ == "__main__":
