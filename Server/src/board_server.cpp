@@ -34,7 +34,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         server->sockets.receive_from_client(client->socket, client->buffer.get(), client->bufferLen);
         std::cout << "receiving from client" << std::endl;
         std::string newMessage{client->buffer.get()};
-        if (newMessage == "") {
+        if (newMessage.size() == 0) {
             // Client disconnected, return
             return;
         }
