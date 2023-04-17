@@ -5,9 +5,13 @@
 #include <iostream>
 
 // Server Implementation
-BoardServer::BoardServer(std::string port) {
+BoardServer::BoardServer(std::string port, int num_groups) {
     sockets.init_winsock(port);
     sockets.create_listener();
+
+    for (int i = 0; i < num_groups; i++) {
+        groups.push_back(std::make_shared<Group>(i));
+    }
 }
 
 void BoardServer::sendMessage(UserConnection& client, std::string message) {
@@ -23,7 +27,9 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         server->sockets.receive_from_client(client->socket, client->buffer.get(), client->bufferLen);
         std::cout << "receiving from client" << std::endl;
         std::string newMessage{client->buffer.get()};
+        std::cout << "read to buffer" << std::endl;
         parsedMessage fields = spam_api::parse(newMessage);
+        std::cout << "parsed message" << std::endl;
         std::string messageType = std::get<std::string>(fields["message_type"]);
         std::cout << "Message type: " << messageType << std::endl;
 
@@ -31,9 +37,10 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         if (messageType == "connect") {
             // Don't need?
         } else if (messageType == "join") {
-            std::cout << "Request for join" << std::endl;
+            int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
+            std::cout << "Request to join group " << group_id << std::endl;
             std::string newUsername = std::get<std::string>(fields["username"]);
-            for (std::string username : server->clientUsernames) {
+            for (std::string username : server->groups.at(group_id)->clientUsernames) {
                 if (newUsername == username) {
                     // Duplicate Username
                     // Send failed join response
@@ -47,46 +54,47 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             }
 
             // Didn't return so username is new, add it to list and respond w/ success
-            server->clientUsernames.push_back(std::get<std::string>(fields["username"]));
+            server->groups.at(group_id)->clientUsernames.push_back(std::get<std::string>(fields["username"]));
             std::string response = spam_api::gen::respond::join(true, "User added");
             server->sendMessage(*client, response);
             client->name = std::get<std::string>(fields["username"]);
 
             // Let other users know a another user joined
             std::cout << "Yo new client just dropped" << std::endl;
-            for (int i = 0; i < server->clientUsernames.size(); i++) {
+            for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 if (server->clients.at(i)->name != client->name) {
                     std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
-                    std::string response = spam_api::gen::respond::getusers(server->clientUsernames);
+                    std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
                     server->sendMessage(*server->clients.at(i), response);
                 }
             }
             // Inform client of last 2 messages posted
             std::cout << "sending previous messages" << std::endl;
-            std::cout << server->messages.size() << std::endl;
-            for (int i = server->messages.size();
-                 (i > server->messages.size()-2) || (i > 0);
+            std::cout << server->groups.at(group_id)->messages.size() << std::endl;
+            for (int i = server->groups.at(group_id)->messages.size();
+                 (i > server->groups.at(group_id)->messages.size()-2) || (i > 0);
                  i--) {
-                auto sender = server->messages.at(i-1)["sender"];
-                auto post_date = server->messages.at(i-1)["post_date"];
-                auto subject = server->messages.at(i-1)["subject"];
-                auto content = server->messages.at(i-1)["content"];
-                auto resp = spam_api::gen::respond::message(std::to_string(i-1), sender, post_date, subject, content);
+                auto sender = server->groups.at(group_id)->messages.at(i-1)["sender"];
+                auto post_date = server->groups.at(group_id)->messages.at(i-1)["post_date"];
+                auto subject = server->groups.at(group_id)->messages.at(i-1)["subject"];
+                auto content = server->groups.at(group_id)->messages.at(i-1)["content"];
+                auto resp = spam_api::gen::respond::message(std::to_string(i-1), std::to_string(group_id), sender, post_date, subject, content);
                 server->sendMessage(*client, resp);
                 std::cout << std::to_string(i) << std::endl;
                 std::cout << subject << ", " << content << std::endl;
             }
         } else if (messageType == "post") {
             std::cout << "Request for post" << std::endl;
+            int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             // Store the message
             std::map<std::string, std::string> tempMessage;
             //tempMessage["message_id"] = std::get<std::string>(fields["message_id"]);
-            tempMessage["message_id"] = std::to_string(server->messages.size());
+            tempMessage["message_id"] = std::to_string(server->groups.at(group_id)->messages.size());
             tempMessage["sender"] = std::get<std::string>(fields["sender"]);
             tempMessage["post_date"] = std::get<std::string>(fields["post_date"]);
             tempMessage["subject"] = std::get<std::string>(fields["subject"]);
             tempMessage["content"] = std::get<std::string>(fields["content"]);
-            server->messages.push_back(tempMessage);
+            server->groups.at(group_id)->messages.push_back(tempMessage);
 
             // Tell the client it was received successfully
             server->sendMessage(*client, spam_api::gen::respond::post(true, tempMessage["message_id"]));
@@ -94,42 +102,45 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             // TODO: Notify other users a new message is available
         } else if (messageType == "message") {
             std::cout << "Request for message" << std::endl;
+            int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             auto id = std::stoi(std::get<std::string>(fields["message_id"]));
-            if (id >= server->messages.size()) {
+            if (id >= server->groups.at(group_id)->messages.size()) {
                 // Requesting an invalid message id
                 // Send error message
                 auto resp = spam_api::gen::respond::message(false, "invalid message id");
                 server->sendMessage(*client, resp);
                 continue;
             }
-            auto sender = server->messages.at(id)["sender"];
-            auto post_date = server->messages.at(id)["post_date"];
-            auto subject = server->messages.at(id)["subject"];
-            auto content = server->messages.at(id)["content"];
-            auto resp = spam_api::gen::respond::message(std::to_string(id), sender, post_date, subject, content);
+            auto sender = server->groups.at(group_id)->messages.at(id)["sender"];
+            auto post_date = server->groups.at(group_id)->messages.at(id)["post_date"];
+            auto subject = server->groups.at(group_id)->messages.at(id)["subject"];
+            auto content = server->groups.at(group_id)->messages.at(id)["content"];
+            auto resp = spam_api::gen::respond::message(std::to_string(id), std::to_string(group_id), sender, post_date, subject, content);
             server->sendMessage(*client, resp);
         } else if (messageType == "leave") {
+            int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             auto resp = spam_api::gen::respond::leave(true, client->name);
             server->sendMessage(*client, resp);
             // Remove the client from the server's lists
-            for (int i = 0; i < server->clientUsernames.size(); i++) {
-                if (server->clientUsernames.at(i) == client->name) {
-                    server->clientUsernames.erase(server->clientUsernames.begin()+i);
+            for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
+                if (server->groups.at(group_id)->clientUsernames.at(i) == client->name) {
+                    server->groups.at(group_id)->clientUsernames.erase(server->groups.at(group_id)->clientUsernames.begin()+i);
                 }
                 if (server->clients.at(i)->name == client->name) {
                     server->clients.erase(server->clients.begin()+i);
                 }
             }
             // Update the other users on the change
-            for (int i = 0; i < server->clientUsernames.size(); i++) {
+            for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
-                std::string response = spam_api::gen::respond::getusers(server->clientUsernames);
+                std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
                 server->sendMessage(*server->clients.at(i), response);
             }
             return;
         } else if (messageType == "getusers") {
             std::cout << "Request for getusers" << std::endl;
-            std::string response = spam_api::gen::respond::getusers(server->clientUsernames);
+            int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
+            std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
             server->sendMessage(*client, response);
         }
     }
@@ -139,13 +150,16 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 UserConnection::UserConnection(SOCKET socket, int bufferLen)
     : socket{socket}, bufferLen{bufferLen}, buffer{new char[bufferLen]}{};
 
+// Group Implementation
+Group::Group(int group_id)
+    : group_id{group_id}{};
 
 // Main event loop
 int main() {
     std::vector<std::thread> threads;
 
     // Init the server
-    BoardServer main_server("42000");
+    BoardServer main_server("42000", 5);
 
     while (true) {
         // Listen for connections

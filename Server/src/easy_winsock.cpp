@@ -1,4 +1,5 @@
 #include "easy_winsock.hpp"
+#include <stdexcept>
 
 
 WinsockManager::WinsockManager() {
