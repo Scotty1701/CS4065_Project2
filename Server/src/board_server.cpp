@@ -31,13 +31,12 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
     std::cout << "Client: " << client->socket << std::endl;
     while (true) {
         // Get a message from the client
-        server->sockets.receive_from_client(client->socket, client->buffer.get(), client->bufferLen);
-        std::cout << "receiving from client" << std::endl;
-        std::string newMessage{client->buffer.get()};
-        if (newMessage.size() == 0) {
+        auto result = server->sockets.receive_from_client(client->socket, client->buffer.get(), client->bufferLen);
+        if (result == 0) {
             // Client disconnected, return
             return;
         }
+        std::string newMessage{client->buffer.get()};
         std::cout << "read to buffer" << std::endl;
         parsedMessage fields = spam_api::parse(newMessage);
         std::cout << "parsed message" << std::endl;
@@ -47,6 +46,9 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         // Respond appropriately
         if (messageType == "connect") {
             // Don't need?
+            std::string response = spam_api::gen::respond::connect(true, "Connected");
+            server->sendMessage(*client, response);
+            std::cout << "Sent response to connect" << std::endl;
         } else if (messageType == "join") {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             std::cout << "Request to join group " << group_id << std::endl;
