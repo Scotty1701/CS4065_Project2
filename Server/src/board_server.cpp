@@ -6,7 +6,8 @@
 
 // Server Implementation
 BoardServer::BoardServer(std::string port, int num_groups) {
-    sockets.init_winsock(port);
+    auto result = sockets.init_winsock(port);
+    std::cout << "Started server on " << result << ":" << port << std::endl;
     sockets.create_listener();
 
     for (int i = 0; i < num_groups; i++) {

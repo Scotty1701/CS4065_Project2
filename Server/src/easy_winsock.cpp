@@ -16,7 +16,7 @@ WinsockManager::WinsockManager() {
 SOCKET WinsockManager::get_client_socket(int index) {
     return clientSockets.at(index);
 }
-int WinsockManager::init_winsock(std::string port) {
+std::string WinsockManager::init_winsock(std::string port) {
     #if _WIN32
       int startup_result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     #else
@@ -36,7 +36,9 @@ int WinsockManager::init_winsock(std::string port) {
         throw exception(message.c_str());
     }
 
-    return get_addr_info_result;
+    struct sockaddr_in *addr_in = (struct sockaddr_in*)result;
+    auto address = std::string{inet_ntoa(addr_in->sin_addr)};
+    return address;
 }
 
 int WinsockManager::create_listener() {

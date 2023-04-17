@@ -54,7 +54,7 @@ class WinsockManager {
 
         SOCKET get_client_socket(int index);
 
-        int init_winsock(std::string port);
+        std::string init_winsock(std::string port);
 
         int create_listener();
 
