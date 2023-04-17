@@ -25,9 +25,7 @@ class CLI:
 
     def __init__(self):
         self.console = Console()
-        self.output = self.console.capture()
-        with self.output:
-            self.console.print("welcome to the output")
+        self.output = ""
         self.pager = self.console.pager()
         self.events = {}
         self.client = Client(self.write_event)
@@ -63,18 +61,19 @@ class CLI:
             elif len(args) > 0 and args[0] == "output":
                 self.print_event.wait(2)
                 with self.pager:
-                    self.console.print(self.output.get())
+                    self.console.print(self.output)
             else:
                 print("No command by that name")
 
             if len(args) > 0 and args[0] == "help":
                 self.print_event.wait(2)
                 with self.pager:
-                    self.console.print(self.output.get())
+                    self.console.print(self.output)
 
     def safe_print(self, s):
-        with self.output:
+        with self.console.capture() as capture:
             self.console.print(s)
+        self.output += capture.get()
         self.print_event.set()
 
     def write_event(self, key, value=None):
