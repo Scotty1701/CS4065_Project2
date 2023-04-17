@@ -35,6 +35,7 @@ class BoardServer {
         std::vector<std::shared_ptr<Group>> groups;
 
         BoardServer(std::string port, int num_groups);
+        ~BoardServer();
 
         void sendMessage(UserConnection& client, std::string message);
 

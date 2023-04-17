@@ -16,6 +16,11 @@ BoardServer::BoardServer(std::string port, int num_groups) {
     }
 }
 
+BoardServer::~BoardServer() {
+    sockets.close_all_connections();
+    sockets.shutdown_winsock();
+}
+
 void BoardServer::sendMessage(UserConnection& client, std::string message) {
     sockets.send_to_client(client.socket, message.c_str(), message.size());
 }
