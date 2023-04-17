@@ -2,7 +2,7 @@ import time
 from .client import Client
 from .client import threaded
 from .client import event_list
-from rich import print as richprint
+from rich import print as print
 from rich.table import Table
 from getkey import getkey, keys
 import sys
@@ -12,6 +12,7 @@ from threading import Event
 from threading import Thread
 import signal
 from rich.console import Console
+from rich.text import Text
 import os
 
 os.system("")
@@ -26,7 +27,6 @@ class CLI:
     def __init__(self):
         self.console = Console()
         self.output = ""
-        self.pager = self.console.pager()
         self.events = {}
         self.client = Client(self.write_event)
         self.print_event = Event()
@@ -60,15 +60,18 @@ class CLI:
                 Thread(target=f, args=args[1:]).start()
             elif len(args) > 0 and args[0] == "output":
                 self.print_event.wait(2)
-                with self.pager:
-                    self.console.print(self.output)
+                with self.console.pager(styles=False):
+                    self.console.print(Text.from_ansi(self.output))
             else:
                 print("No command by that name")
 
             if len(args) > 0 and args[0] == "help":
                 self.print_event.wait(2)
-                with self.pager:
-                    self.console.print(self.output)
+                with self.console.pager(styles=False):
+                    self.console.print(
+                        "you can view this output again by typing [bold blue]output[/bold blue]"
+                    )
+                    self.console.print(Text.from_ansi(self.output))
 
     def safe_print(self, s):
         with self.console.capture() as capture:
@@ -91,4 +94,4 @@ class CLI:
         t = Table()
         t.add_column(username)
         t.add_row(content)
-        self.safe_print(value)
+        self.safe_print(t)

@@ -5,6 +5,7 @@ import time
 import re
 import pyspam
 from datetime import datetime
+import inspect
 
 event_list = ["log", "group", "message", "exit"]
 
@@ -20,7 +21,10 @@ def threaded(func):
 class Client:
     left_bracket = re.compile(r"{")
     right_bracket = re.compile(r"}")
-    command_list = ["connect", "join", "post", "exit", "help"]
+    command_list = [
+        "connect", "join", "post", "exit", "help", "message", "leave",
+        "getusers", "getgroups"
+    ]
 
     def __init__(self, write_event):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -68,11 +72,33 @@ class Client:
                                           content)
         self.server_socket.sendall(message.encode())
 
+    def message(self, group_id, message_id):
+        message = pyspam.gen.request.message(group_id, message_id)
+        self.server_socket.sendall(message.encode())
+
+    def leave(self, group_id="1"):
+        message = pyspam.gen.request.leave(group_id)
+        self.server_socket.sendall(message.encode())
+
+    def getusers(self, group_id="1"):
+        message = pyspam.gen.request.getusers(group_id)
+        self.server_socket.sendall(message.encode())
+
+    def getgroups(self, *args):
+        message = pyspam.gen.request.getgroups()
+        self.server_socket.sendall(message.encode())
+
     def help(self, command=None):
         if command:
-            self.write_event("log", getattr(self, command).__doc__)
+            f = getattr(self, command)
+            sig = inspect.signature(f)
+            args = list(sig.parameters.values())
+            args = [str(arg) for arg in args]
+            self.write_event(
+                "log",
+                getattr(self, command).__doc__ + f"\nargs:\n{args}")
             return
         self.write_event("log", f"Available commands:{self.command_list}")
-        import time
-        time.sleep(2)
-        self.write_event("message", ["hi", "world"])
+        # import time
+        # time.sleep(2)
+        # self.write_event("message", ["hi", "world"])
