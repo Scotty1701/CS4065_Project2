@@ -79,7 +79,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             std::cout << "Length of clients: " << server->clients.size() << std::endl;
             std::cout << "Length of clientsUsernames: " << server->groups.at(group_id)->clientUsernames.size() << std::endl;
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
-                if (server->clients.at(i)->name != client->name) {
+                if (server->groups.at(group_id)->clientUsernames.at(i) != client->name) {
                     std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
                     std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
                     server->sendMessage(*server->clients.at(i), response);
