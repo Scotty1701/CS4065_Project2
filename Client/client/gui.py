@@ -10,7 +10,7 @@ class gui:
 
     def __init__(self, theme):
         # set of groups, each containing a list of messages
-        self.current_group = None
+        self.group_id = None
 
         # display theme preview
         if theme == "preview":
@@ -126,7 +126,7 @@ class gui:
         def connect_and_ask_for_groups(address, port):
             self.client.connect(address, port)
             self.client.getgroups()
-            self.write_event("GUI_join", values)
+            self.write_event("GUI_join", ["0"])
 
         Thread(target=connect_and_ask_for_groups, args=(address, port)).start()
 
@@ -135,9 +135,11 @@ class gui:
         if username == "":
             sg.popup_ok("you need to enter a username to join a group")
             return
-        group_id = values["GUI_join"][0]
+        self.group_id = values["GUI_join"][0]
+        self.window["GUI_join"].update(set_to_index=self.group_id)
+
         self.window["messages"].update("")
-        Thread(target=self.client.join, args=(username, group_id)).start()
+        Thread(target=self.client.join, args=(username, self.group_id)).start()
 
     def GUI_post(self, values):
         subject = values["GUI_subject"]
@@ -156,6 +158,8 @@ class gui:
     def getgroups(self, value):
         groups = value["groups"]
         self.window["GUI_join"].update(groups)
+        if self.group_id:
+            self.window["GUI_join"].update(set_to_index=self.group_id)
 
     def post(self, value):
         print(value)
