@@ -86,11 +86,9 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             // Let other users know a another user joined
             std::cout << "Yo new client just dropped" << std::endl;
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
-                if (server->groups.at(group_id)->clientUsernames.at(i) != client->name) {
-                    std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
-                    std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
-                    server->sendMessage(*server->clients.at(i), response);
-                }
+                std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
+                std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
+                server->sendMessage(*server->clients.at(i), response);
             }
             // Inform client of last 2 messages posted
             std::cout << "sending previous messages" << std::endl;
