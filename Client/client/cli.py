@@ -26,6 +26,7 @@ class Exit(Exception):
 class CLI:
 
     def __init__(self):
+        """ Create the CLI object, starting the event and input loops"""
         self.console = Console()
         self.output = ""
         self.events = {}
@@ -41,16 +42,19 @@ class CLI:
 
     @threaded
     def __event_loop(self):
+        """ listen for events from the client object """
         while True:
             time.sleep(0.05)
             for event in self.events.copy().keys():
                 value = self.events.pop(event)
                 if event in event_list:
+                    # if event in this class, run function
                     f = getattr(self, event)
                     f(value)
 
     @threaded
     def __input(self):
+        """ input loop that starts client threads """
         while self.on:
             i = input("> ")
 
@@ -98,7 +102,6 @@ class CLI:
 
     def exit(self, *args):
         self.on = False
-        sys.exit(0)
 
     def post(self, value):
         self.safe_print("message delivered successfully")
@@ -111,6 +114,9 @@ class CLI:
 
     def leave(self, value):
         self.safe_print("left successfully")
+
+    def getgroups(self, value):
+        pass
 
     def message(self, value):
         username, subject, content, id, date, group = value["sender"], value[

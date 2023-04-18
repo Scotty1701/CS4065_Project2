@@ -9,8 +9,7 @@ dependencies = [
     'importlib-metadata; python_version<"3.8"',
     'pysimplegui',
     'rich-click',
-    'rich',
-    'getkey'
+    'rich'
 ]
 
 [project.scripts]

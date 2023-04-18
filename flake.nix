@@ -46,7 +46,7 @@
 
                 copyToRoot = buildEnv {
                   name = "image-root";
-                  paths = [ packages.client packages.server bashInteractive coreutils ];
+                  paths = [ packages.client packages.server bashInteractive coreutils less ];
                   pathsToLink = [ "/bin" ];
                 };
                 config = {

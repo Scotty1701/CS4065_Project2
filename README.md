@@ -1,6 +1,23 @@
-# Running
+# Usage
 
-To run the programs in the repo, you can either go the nix route (probably easier), docker route (easiest?), or the manual route.
+Some of the usage instructions for the client are different from
+what was given in the assignment, refer to the README in the `Client` directory for more info.
+
+To start the server:
+
+```
+server
+```
+
+To start the client (it should walk you through it):
+
+```
+client
+```
+
+# Getting up and Running
+
+To run the programs in the repo, you can either go the nix route (probably easier), docker route (also fairly easy), or the manual route.
 
 ## Nix route
 
@@ -13,11 +30,13 @@ To run the programs in the repo, you can either go the nix route (probably easie
 
 ## Docker route
 
-Assuming you have the docker image file
+> note that the docker image can be generated using the `nix build .#docker` command if you really want the container separately
+
+> Assuming you have the docker image file
 
 - `docker load -i image`
 
-If you want the gui to work:
+If you want the gui to work you'll need wsl2 on Windows (untested) or a Linux environment:
 
 - you'll need `xhost` (`sudo apt install x11-utils`)
 
@@ -42,11 +61,13 @@ You can connect to an existing instance of the docker container with
 
 ```bash
 docker exec -it <container name> bash
+client cli
+client gui
 ```
 
 While in the container you can run `server` to start the server and `client` to run the client.
 
-if you want server and clients in the same shell, do something like
+If you want server and clients in the same shell, do something like:
 
 ```bash
 server > serverlog.txt&
@@ -56,7 +77,11 @@ client gui&
 client cli
 ```
 
+> note: I do not recommend this
+
 ## Manual route
+
+> note that this method is untested, but it should work "in theory"
 
 ### Prerequisites
 
@@ -68,3 +93,10 @@ client cli
 
 - First follow the build instructions in the README of the `Protocol` directory.
 - Then follow the build/run instructions in each of the `Client` and `Server` directories
+
+# Major struggles
+
+- Making the client and server mature at the same time was very difficult.
+  It involved a lot of back and forth between teammates to ensure we were implementing the right kind of communication
+
+- client gui was more difficult than anticipated, I also chose a very limited gui framework by accident, haven't really worked with GUIs before
