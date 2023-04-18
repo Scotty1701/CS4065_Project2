@@ -1,6 +1,6 @@
 # Authors
 
-David Lewis, Issac Poplin
+David Lewis, Isaac Poplin
 
 # Usage
 
