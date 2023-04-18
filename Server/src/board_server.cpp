@@ -52,8 +52,14 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->sendMessage(*client, response);
             std::cout << "Sent response to connect" << std::endl;
         } else if (messageType == "join") {
-            int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
+            unsigned int group_id = (unsigned int)std::stoi(std::get<std::string>(fields["group_id"]));
             std::cout << client->name << " requests to join group " << group_id << std::endl;
+            if (group_id >= server->groups.size()) {
+                // Group out of range
+                auto resp = spam_api::gen::respond::join(false, "Group id out of range");
+                server->sendMessage(*client, resp);
+                continue;
+            }
             std::string newUsername = std::get<std::string>(fields["username"]);
             std::string response = spam_api::gen::respond::join(true, "User added");
 
