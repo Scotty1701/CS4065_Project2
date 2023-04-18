@@ -135,12 +135,18 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             auto resp = spam_api::gen::respond::leave(true, client->name);
             server->sendMessage(*client, resp);
+            std::cout << "Told client to get out" << std::endl;
             // Remove the client from the server's lists
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 if (server->groups.at(group_id)->clientUsernames.at(i) == client->name) {
+                    std::cout << "erasing clientUsername: " << server->groups.at(group_id)->clientUsernames.at(i) << std::endl;
                     server->groups.at(group_id)->clientUsernames.erase(server->groups.at(group_id)->clientUsernames.begin()+i);
+                    break;
                 }
+            }
+            for (int i = 0; i < server->clients.size(); i++) {
                 if (server->clients.at(i)->name == client->name) {
+                    std::cout << "erasing client: " << server->clients.at(i) << std::endl;
                     server->clients.erase(server->clients.begin()+i);
                 }
             }
