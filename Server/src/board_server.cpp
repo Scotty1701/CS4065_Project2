@@ -148,12 +148,18 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             auto resp = spam_api::gen::respond::message(std::to_string(id), std::to_string(group_id), sender, post_date, subject, content);
             server->sendMessage(*client, resp);
         } else if (messageType == "leave") {
-            int group_id;
+            unsigned int group_id;
             try {
-                group_id = std::stoi(std::get<std::string>(fields["group_id"]));
+                group_id = (unsigned int)std::stoi(std::get<std::string>(fields["group_id"]));
             }
             catch(std::exception) {
                 auto resp = spam_api::gen::respond::leave(false, "Invalid group id");
+                server->sendMessage(*client, resp);
+                continue;
+            }
+            if (group_id >= server->groups.size()) {
+                // Group out of range
+                auto resp = spam_api::gen::respond::message(false, "Group id out of range");
                 server->sendMessage(*client, resp);
                 continue;
             }
