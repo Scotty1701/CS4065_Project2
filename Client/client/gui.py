@@ -1,13 +1,15 @@
 import PySimpleGUI as sg
 from threading import Thread, Event
 from .client import Client
+from .client import event_list
+from rich import print
+from rich.panel import Panel
 
 
 class gui:
 
     def __init__(self, theme):
         # set of groups, each containing a list of messages
-        self.groups = {}
         self.current_group = None
 
         # display theme preview
@@ -42,29 +44,32 @@ class gui:
                      expand_x=True,
                      expand_y=True,
                      size=(600, 400))
-        ], [sg.Text("Enter your message:")],
-            [sg.InputText(key="message", expand_x=True)],
-            [sg.Button("Send")]],
+        ], [sg.Text("Enter your message:")
+            ], [sg.InputText("Subject", key="GUI_subject", expand_x=True)
+                ], [sg.InputText("message", key="GUI_message", expand_x=True)],
+            [sg.Button("Send", key="GUI_post")]],
             expand_x=True,
             expand_y=True)
         groups = sg.Column([
             [
-                sg.Text("Server Address"),
-                sg.InputText(key="address", size=(20, 0))
+                sg.Text("Address"),
+                sg.InputText("127.0.0.1", key="address", size=(20, 0)),
             ],
+            [sg.Text("Port"),
+             sg.InputText("42000", key="port", size=(20, 0))],
             [sg.Text("Username"),
              sg.InputText(key="username", size=(20, 0))],
-            [sg.Button("Connect")],
+            [sg.Button("Connect", key="GUI_connect")],
             [
                 sg.Frame(title="Groups",
                          layout=[[
-                             sg.Listbox(self.groups,
+                             sg.Listbox([],
                                         expand_x=True,
                                         expand_y=True,
                                         no_scrollbar=True,
                                         enable_events=True,
                                         pad=5,
-                                        key="groups")
+                                        key="GUI_join")
                          ]],
                          expand_x=True,
                          expand_y=True)
@@ -96,24 +101,59 @@ class gui:
     def __event_loop(self):
         while True:
             event, values = self.window.read()
-            if event.split("_")[1] in event_list:
-                f = getattr(self, event)
-                f(values)
-            if event in self.client.command_list:
-                f(values)
-
+            if event is not None:
+                ogevent = event
+                event = event.split("_")
             if event == sg.WIN_CLOSED:
+                self.client.exit()
                 return
-            if event == "post":
-                message = values["message"]
-                self.window["message"]("")
-                if self.username and self.current_group:
-                    self.create_message(self.username, message)
-                else:
-                    print("no username")
-            if event == "Connect":
-                self.username = values["username"]
-                self.client.connect(values["address"])
+            if event[0] == "GUI":
+                if event[1] in self.client.command_list:
+                    f = getattr(self, ogevent)
+                    f(values)
+            elif ogevent in event_list:
+                f = getattr(self, ogevent)
+                f(values[ogevent])
+
+            # rint(event, values)
+
+    def GUI_connect(self, values):
+        address = values["address"]
+        port = values["port"]
+
+        def connect_and_ask_for_groups(address, port):
+            self.client.connect(address, port)
+            self.client.getgroups()
+
+        Thread(target=connect_and_ask_for_groups, args=(address, port)).start()
+
+    def GUI_join(self, values):
+        username = values["username"]
+        group_id = values["GUI_join"][0]
+        print(values["GUI_join"])
+        self.window["messages"].update("")
+        Thread(target=self.client.join, args=(username, group_id)).start()
+
+    def GUI_post(self, values):
+        subject = values["GUI_subject"]
+        content = values["GUI_subject"]
+        Thread(target=self.client.post, args=(subject, content)).start()
+
+    def log(self, value):
+        print(value)
+
+    def join(self, value):
+        print(value)
+
+    def connect(self, value):
+        print(value)
+
+    def getgroups(self, value):
+        groups = value["groups"]
+        self.window["GUI_join"].update(groups)
+
+    def post(self, value):
+        print(value)
 
     def message(self, value):
         username, subject, content, id, date, group = value["sender"], value[
@@ -125,19 +165,10 @@ class gui:
                                       justification="c",
                                       background_color=self.colors["INPUT"],
                                       end="\n")
-        if self.current_group in self.groups:
-            self.groups[self.current_group].append((username, message))
-        else:
-            self.groups[self.current_group] = [(username, message)]
         self.window["messages"].print("",
-                                      message,
+                                      content,
                                       text_color=self.colors["TEXT"],
                                       end="\n\n")
-
-    def listen(self, command=None):
-        if command:
-            Thread(target=getattr(client, command))
-            return
 
 
 if __name__ == "__main__":

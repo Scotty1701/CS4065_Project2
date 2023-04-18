@@ -8,7 +8,7 @@ from datetime import datetime
 import inspect
 
 event_list = [
-    "log", "group", "message", "exit", "post", "join", "connect", "leave"
+    "log", "getgroups", "message", "exit", "post", "join", "connect", "leave"
 ]
 
 
@@ -75,7 +75,7 @@ class Client:
     def exit(self):
         """ exit the client"""
         self.server_socket.close()
-        self.write_event("exit")
+        self.write_event("exit", "")
 
     def post(self, subject: str, *content: str):
         """ send messages !!"""
