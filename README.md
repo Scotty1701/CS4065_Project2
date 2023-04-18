@@ -109,4 +109,9 @@ client cli
   I also chose a very limited gui framework by accident,
   and haven't really worked with GUIs a lot before. I'm pretty happy with the final result though.
 
--
+- Lots of work was due to different development environments (windows 10 vs linux+nix) and the associated compatibility issues
+  Eventually settled on updating the socket abstractin library we created to work for windows and linux
+  Also used docker+wsl2 to test on windows 10
+
+- The communication protocol was the first part of the project developed and implemented, so several times we had to go back
+  and change a major part after realizing it wouldn't work well when implementing some part of the client or server.
