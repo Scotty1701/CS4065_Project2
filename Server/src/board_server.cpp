@@ -45,7 +45,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
         // Respond appropriately
         if (messageType == "connect") {
-            // Don't need?
             std::string response = spam_api::gen::respond::connect(true, "Connected");
             server->sendMessage(*client, response);
             std::cout << "Sent response to connect" << std::endl;
@@ -77,6 +76,8 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
             // Let other users know a another user joined
             std::cout << "Yo new client just dropped" << std::endl;
+            std::cout << "Length of clients: " << server->clients.size() << std::endl;
+            std::cout << "Length of clientsUsernames: " << server->groups.at(group_id)->clientUsernames.size() << std::endl;
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 if (server->clients.at(i)->name != client->name) {
                     std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
