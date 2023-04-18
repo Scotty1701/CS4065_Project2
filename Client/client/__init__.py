@@ -1,6 +1,7 @@
 import rich_click as click
 from .gui import gui as G
 from .cli import CLI
+import signal
 
 # @click.group()
 # def cli():

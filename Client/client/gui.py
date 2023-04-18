@@ -25,7 +25,6 @@ class gui:
             a = f"ACCENT{i}"
             if a not in self.colors:
                 self.colors[a] = list(self.colors.values())[i]
-        print(self.colors)
         messager = sg.Column([[
             sg.Frame(title="messages",
                      layout=[[
@@ -44,9 +43,11 @@ class gui:
                      expand_x=True,
                      expand_y=True,
                      size=(600, 400))
-        ], [sg.Text("Enter your message:")
-            ], [sg.InputText("Subject", key="GUI_subject", expand_x=True)
-                ], [sg.InputText("message", key="GUI_message", expand_x=True)],
+        ], [sg.Text("Subject")
+            ], [
+                sg.InputText(key="GUI_subject", expand_x=True),
+        ], [sg.Text("Message")],
+            [sg.InputText(key="GUI_content", expand_x=True)],
             [sg.Button("Send", key="GUI_post")]],
             expand_x=True,
             expand_y=True)
@@ -93,7 +94,8 @@ class gui:
         self.current_group = "main"
 
         self.window = sg.Window('Window Title', self.layout, resizable=True)
-        self.client = Client(self.window.write_event_value)
+        self.write_event = self.window.write_event_value
+        self.client = Client(self.write_event)
         self.username = None
         self.__event_loop()
         self.window.close()
@@ -124,19 +126,22 @@ class gui:
         def connect_and_ask_for_groups(address, port):
             self.client.connect(address, port)
             self.client.getgroups()
+            self.write_event("GUI_join", values)
 
         Thread(target=connect_and_ask_for_groups, args=(address, port)).start()
 
     def GUI_join(self, values):
         username = values["username"]
+        if username == "":
+            sg.popup_ok("you need to enter a username to join a group")
+            return
         group_id = values["GUI_join"][0]
-        print(values["GUI_join"])
         self.window["messages"].update("")
         Thread(target=self.client.join, args=(username, group_id)).start()
 
     def GUI_post(self, values):
         subject = values["GUI_subject"]
-        content = values["GUI_subject"]
+        content = values["GUI_content"]
         Thread(target=self.client.post, args=(subject, content)).start()
 
     def log(self, value):
@@ -155,6 +160,13 @@ class gui:
     def post(self, value):
         print(value)
 
+    def leave(self, value):
+        print(value)
+
+    def exit(self, value):
+        print(value)
+        print("server exited")
+
     def message(self, value):
         username, subject, content, id, date, group = value["sender"], value[
             "subject"], value["content"], value["message_id"], value[
@@ -166,9 +178,16 @@ class gui:
                                       background_color=self.colors["INPUT"],
                                       end="\n")
         self.window["messages"].print("",
+                                      "Subject:" + subject,
+                                      text_color=self.colors["TEXT_INPUT"],
+                                      background_color=self.colors["INPUT"],
+                                      end="\n")
+        self.window["messages"].print("",
                                       content,
                                       text_color=self.colors["TEXT"],
                                       end="\n\n")
+        self.window["GUI_content"].update("")
+        self.window["GUI_subject"].update("")
 
 
 if __name__ == "__main__":

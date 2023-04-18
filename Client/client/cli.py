@@ -98,7 +98,6 @@ class CLI:
 
     def exit(self, *args):
         self.on = False
-        sys.exit(0)
 
     def post(self, value):
         self.safe_print("message delivered successfully")
