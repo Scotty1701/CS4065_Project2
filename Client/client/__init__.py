@@ -1,13 +1,26 @@
 import rich_click as click
-from .gui import gui
+from .gui import gui as G
+from .cli import CLI
+
+# @click.group()
+# def cli():
+#    pass
+#
+#
+# @cli.command(help="You can start the cli by not passing the --help flag!")
 
 
-@click.command(
-    help="Hi there! You can start the gui by not passing the --help flag!")
-@click.option("--theme",
-              default="DarkGreen2",
-              help="colors got you down?" +
-              "Change the theme to something you like better!" +
-              "Pass 'preview' to this flag to view possible themes")
-def cli(theme):
-    gui(theme)
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.option('--theme', default="Dark Green")
+def gui(theme):
+    g = G(theme)
+
+
+@cli.command(name="cli")
+def C():
+    c = CLI()

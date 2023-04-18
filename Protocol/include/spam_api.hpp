@@ -1,7 +1,12 @@
+#ifndef SPAM_API_HPP
+#define SPAM_API_HPP
+
 #include <json/json.h>
 #include <vector>
 #include <map>
 #include <variant>
+
+typedef std::map<std::string, std::variant<std::string, std::vector<std::string>>> parsedMessage;
 
 namespace spam_api {
 
@@ -14,67 +19,54 @@ namespace request {
 std::string connect(std::string address, std::string port);
 
 // Create a message to request to join
-std::string join(std::string username);
+std::string join(std::string username, std::string group_id);
 
 // Create a message to post a new message to the board
-std::string post(std::string message_id, std::string sender, std::string post_date, std::string subject, std::string content);
+std::string post(std::string group_id, std::string sender, std::string post_date, std::string subject, std::string content);
 
 // Create a message to request a posted message
-std::string message(std::string requested_message_id);
+std::string message(std::string group_id, std::string requested_message_id);
 
 // Create a message to request leaving the board
-std::string leave(std::string username);
+std::string leave(std::string group_id);
 
 // Create a message to request the current users
 std::string getusers(std::string group_id);
+
+std::string getgroups();
 
 } // namespace request
 
 namespace respond {
 
 // Create a message to respond to a connection request
-std::string connect(bool success);
+std::string connect(bool success, std::string message);
 
 // Create a message to respond to a join request
-std::string join(bool success);
+std::string join(bool success, std::string message);
 
 // Create a message to respond to a post request
-std::string post(bool success);
+std::string post(bool success, std::string message);
 
 // Create a message to respond to a message request
-std::string message(std::string message_id, std::string sender, std::string post_date, std::string subject, std::string content);
+std::string message(std::string message_id, std::string group_id, std::string sender, std::string post_date, std::string subject, std::string content);
+std::string message(bool success, std::string message);
 
 // Create a message to respond to a leave request
-std::string leave(bool success);
+std::string leave(bool success, std::string message);
 
 // Create a message to respond to a getusers request
 std::string getusers(std::vector<std::string> users);
+std::string getusers(bool success, std::string message);
+
+std::string getgroups(std::vector<std::string> groups);
+std::string getgroups(bool success, std::string message);
 
 } // namespace respond
 } // namespace gen
 
-namespace parse {
+parsedMessage parse(std::string& json_message);
 
-namespace request {
-
-std::map<std::string, std::string> connect(std::string& json_message);
-std::map<std::string, std::string> join(std::string& json_message);
-std::map<std::string, std::string> post(std::string& json_message);
-std::map<std::string, std::string> message(std::string& json_message);
-std::map<std::string, std::string> leave(std::string& json_message);
-std::map<std::string, std::string> getusers(std::string& json_message);
-
-} // namespace request
-
-namespace respond {
-
-std::map<std::string, std::string> connect(std::string& json_message);
-std::map<std::string, std::string> join(std::string& json_message);
-std::map<std::string, std::string> post(std::string& json_message);
-std::map<std::string, std::string> message(std::string& json_message);
-std::map<std::string, std::string> leave(std::string& json_message);
-std::map<std::string, std::variant<std::string, std::vector<std::string>>> getusers(std::string& json_message);
-
-} // namespace respond
-} // namespace parse
 } // namespace spam_api
+
+#endif
