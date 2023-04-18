@@ -127,7 +127,13 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             }
         } else if (messageType == "message") {
             std::cout << "Request for message" << std::endl;
-            int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
+            unsigned int group_id = (unsigned int)std::stoi(std::get<std::string>(fields["group_id"]));
+            if (group_id >= server->groups.size()) {
+                // Group out of range
+                auto resp = spam_api::gen::respond::message(false, "Group id out of range");
+                server->sendMessage(*client, resp);
+                continue;
+            }
             auto id = std::stoi(std::get<std::string>(fields["message_id"]));
             if (id >= server->groups.at(group_id)->messages.size()) {
                 // Requesting an invalid message id, send error message
