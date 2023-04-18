@@ -1,3 +1,7 @@
+# Authors
+
+David Lewis, Issac Poplin
+
 # Usage
 
 Some of the usage instructions for the client are different from

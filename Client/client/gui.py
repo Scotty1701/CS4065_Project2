@@ -6,6 +6,7 @@ from rich import print
 from rich.panel import Panel
 from rich.console import Console
 from rich.text import Text
+import sys
 
 
 class gui:
@@ -172,6 +173,7 @@ class gui:
 
     def exit(self, value):
         print(value)
+        sys.exit()
         print("server exited")
 
     def message(self, value):

@@ -9,6 +9,7 @@ import inspect
 import signal
 import sys
 
+# list of events that the frontend can process
 event_list = [
     "log", "getgroups", "message", "exit", "post", "join", "connect", "leave"
 ]
@@ -23,15 +24,23 @@ def threaded(func):
 
 
 class Client:
-    left_bracket = re.compile(r"{")
-    right_bracket = re.compile(r"}")
+    """
+    this class does most of the processing
+    for the client server interaction.
+    It passes its results to the front-end using the write_event function.
+    """
+
+    # list of commands that the client can process from the front-end
     command_list = [
         "connect", "join", "post", "exit", "help", "message", "leave",
         "getusers", "getgroups"
     ]
 
     def __init__(self, write_event):
+        """ set up the needed variables and create signal handler for Ctrl-C"""
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,
+                                      1)
         self.write_event = write_event
         self.recieve_thread = self.recieve()
         self.username = None
@@ -39,9 +48,7 @@ class Client:
         signal.signal(signal.SIGINT, self.signal_handler)
 
     def signal_handler(self, sig, frame):
-        print("Bye bye")
         self.exit()
-        sys.exit()
 
     def sendall(self, message):
         try:
@@ -56,6 +63,12 @@ class Client:
         except OSError:
             print("can't connect to socket, maybe server isn't running?")
             return
+        except ValueError:
+            self.write_event(
+                "log",
+                "Those don't look like the right kind of arguments, you should try again!"
+            )
+            return
         self.recieve_thread.start()
         message = pyspam.gen.request.connect(address, port)
         self.sendall(message)
@@ -67,7 +80,7 @@ class Client:
             try:
                 message += self.server_socket.recv(1024).decode()
             except OSError:
-                self.exit()
+                self.write_event("log", "Lost connection to server")
                 return
             left = message.count("{")
             right = message.count("}")
@@ -87,7 +100,10 @@ class Client:
             print(message)
         message_type = parsed["message_type"]
         if message_type == "":
-            self.exit()
+            self.write_event("log", "Lost connection to server")
+            self.server_socket.close()
+            self.server_socket = socket.socket(socket.AF_INET,
+                                               socket.SOCK_STREAM)
         if message_type in event_list and ogmessage["success"]:
             self.write_event(message_type, parsed)
         else:
@@ -95,7 +111,15 @@ class Client:
 
     def join(self, username: str, groupid: str = "0"):
         """ join the server (join username groupid"""
-        message = pyspam.gen.request.join(username, groupid)
+        try:
+            message = pyspam.gen.request.join(username, str(int(groupid)))
+        except ValueError:
+            self.write_event(
+                "log",
+                "Those don't look like the right kind of arguments, you should try again!"
+            )
+            return
+
         if self.group_id:
             self.leave()
         self.username = username

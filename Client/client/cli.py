@@ -67,7 +67,10 @@ class CLI:
                     try:
                         f(*args)
                     except TypeError as e:
-                        self.write_event("log", "you goofed!!")
+                        self.write_event(
+                            "log",
+                            "you probably used the wrong number of arguments, please check help."
+                        )
 
                 Thread(target=thread_wrapper, args=args[1:]).start()
             elif len(args) > 0 and args[0] == "output":
@@ -86,6 +89,7 @@ class CLI:
                     self.console.print(Text.from_ansi(self.output))
 
     def safe_print(self, s, log=False):
+        """ prints to the output window """
         with self.console.capture() as capture:
             if log:
                 self.console.log(s)
@@ -95,13 +99,17 @@ class CLI:
         self.print_event.set()
 
     def write_event(self, key, value=None):
+        """ this is the interface that the client uses to send events to the cli """
         self.events[key] = value
 
+    # event handlers
     def log(self, content=""):
         self.safe_print(content, log=False)
 
     def exit(self, *args):
         self.on = False
+        self.safe_print("good bye")
+        sys.exit()
 
     def post(self, value):
         self.safe_print("message delivered successfully")
@@ -116,7 +124,7 @@ class CLI:
         self.safe_print("left successfully")
 
     def getgroups(self, value):
-        pass
+        self.safe_print(f"Groups:{value['groups']}")
 
     def message(self, value):
         username, subject, content, id, date, group = value["sender"], value[
