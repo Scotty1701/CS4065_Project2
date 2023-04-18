@@ -67,6 +67,12 @@ Otherwise, you can just do:
 run -it csproject:latest
 ```
 
+Note: you may need to add --network host to the docker command like so:
+
+```bash
+run -it --network host csproject:latest
+```
+
 You can connect to an existing instance of the docker container with
 
 ```bash
