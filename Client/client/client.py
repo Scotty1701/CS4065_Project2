@@ -89,7 +89,7 @@ class Client:
         self.server_socket.sendall(message.encode())
 
     def message(self, message_id):
-        if not group_id:
+        if not self.group_id:
             self.write_event(
                 "log", "you can't get messages from a group you aren't in!!!")
             return
@@ -98,7 +98,7 @@ class Client:
         self.server_socket.sendall(message.encode())
 
     def leave(self):
-        if not group_id:
+        if not self.group_id:
             self.write_event("log", "you can't leave without joining first!!!")
             return
         group_id = self.group_id
@@ -106,7 +106,7 @@ class Client:
         self.server_socket.sendall(message.encode())
 
     def getusers(self):
-        if not group_id:
+        if not self.group_id:
             self.write_event(
                 "log", "you can't get users from a group you aren't in!!!")
             return

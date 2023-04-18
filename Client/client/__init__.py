@@ -11,9 +11,8 @@ from .cli import CLI
 
 
 @click.group()
-@click.option('--debug/--no-debug', default=False)
-def cli(debug):
-    click.echo(f"Debug mode is {'on' if debug else 'off'}")
+def cli():
+    pass
 
 
 @cli.command()
