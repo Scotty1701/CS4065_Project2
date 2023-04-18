@@ -95,7 +95,7 @@ class gui:
         self.__start_gui()
 
     def __start_gui(self):
-        # TODO group joining
+        """ starts the gui loop """
         self.current_group = "main"
 
         self.window = sg.Window('Window Title', self.layout, resizable=True)
@@ -106,6 +106,7 @@ class gui:
         self.window.close()
 
     def __event_loop(self):
+        """ event loop running on the main thread """
         while True:
             event, values = self.window.read()
             if event is not None:
@@ -126,6 +127,7 @@ class gui:
 
             # rint(event, values)
 
+    # commands preceded by GUI are triggered by gui events, while the others are triggered by client events
     def GUI_connect(self, values):
         address = values["address"]
         port = values["port"]
@@ -202,6 +204,7 @@ class gui:
         self.window["GUI_subject"].update("")
 
     def print(self, message, title=None):
+        """ fancy print function """
         with self.console.capture() as capture:
             self.console.print(message)
         out = capture.get()
