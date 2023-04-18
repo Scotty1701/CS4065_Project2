@@ -6,6 +6,8 @@
 #include <memory>
 #include <map>
 
+// Simple class to hold important bits of information for each
+// client connection
 class UserConnection {
     public:
         SOCKET socket;
@@ -17,6 +19,8 @@ class UserConnection {
         UserConnection(SOCKET socket, int bufferLen);
 };
 
+// Simple class that defines a group in the message board
+// Tracks the users and messages within a group
 class Group {
     public:
         int group_id;
@@ -26,6 +30,7 @@ class Group {
         Group(int group_id);
 };
 
+// Main class to hold information for the message board
 class BoardServer {
     private:
 
@@ -34,11 +39,10 @@ class BoardServer {
         std::vector<std::shared_ptr<UserConnection>> clients;
         std::vector<std::shared_ptr<Group>> groups;
 
+        // Start the server on the given port with the given number of groups
         BoardServer(std::string port, int num_groups);
         ~BoardServer();
 
+        // Send a message to the specified client
         void sendMessage(UserConnection& client, std::string message);
-
-        //TODO: is below workable?
-        //void interactWithClient(UserConnection client);
 };

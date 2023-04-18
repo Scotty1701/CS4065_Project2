@@ -7,7 +7,6 @@
 // Server Implementation
 BoardServer::BoardServer(std::string port, int num_groups) {
     auto result = sockets.init_winsock(port);
-    //std::cout << "Started server on " << result << ":" << port << std::endl;
     std::cout << "Started server on " << "127.0.0.1" << ":" << port << std::endl;
     sockets.create_listener();
 
@@ -16,6 +15,7 @@ BoardServer::BoardServer(std::string port, int num_groups) {
     }
 }
 
+// Cleanup sockets when the server closes
 BoardServer::~BoardServer() {
     sockets.close_all_connections();
     sockets.shutdown_winsock();
@@ -25,17 +25,20 @@ void BoardServer::sendMessage(UserConnection& client, std::string message) {
     sockets.send_to_client(client.socket, message.c_str(), message.size());
 }
 
-//TODO: Convert to method of BoardServer (if possible)?
+// Handle receiving and responding to messages from clients
 void interactWithClient(BoardServer* server, UserConnection* client) {
     std::cout << "Started interaction function" << std::endl;
     std::cout << "Client: " << client->socket << std::endl;
     while (true) {
         // Get a message from the client
         auto result = server->sockets.receive_from_client(client->socket, client->buffer.get(), client->bufferLen);
+
         if (result == 0) {
             // Client disconnected, return
             break;
         }
+
+        // Parse info from the message
         std::string newMessage{client->buffer.get()};
         std::cout << "read to buffer" << std::endl;
         parsedMessage fields = spam_api::parse(newMessage);
@@ -50,15 +53,15 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             std::cout << "Sent response to connect" << std::endl;
         } else if (messageType == "join") {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
-            std::cout << "Request to join group " << group_id << std::endl;
+            std::cout << client->name << " requests to join group " << group_id << std::endl;
             std::string newUsername = std::get<std::string>(fields["username"]);
             std::string response = spam_api::gen::respond::join(true, "User added");
 
             // Check for duplicate username
             for (std::string username : server->groups.at(group_id)->clientUsernames) {
                 if (newUsername == username) {
-                    // Duplicate Username
-                    // Send failed join response
+                    // Duplicate Username, send failed join response
+                    std::cout << "User already in group!" << std::endl;
                     response = spam_api::gen::respond::join(false, "Duplicate username");
                     server->sendMessage(*client, response);
 
@@ -69,7 +72,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                 continue;
             }
 
-            // Didn't return so username is new, add it to list and respond w/ success
+            // Didn't continue so username is new, add it to list and respond w/ success
             server->groups.at(group_id)->clientUsernames.push_back(std::get<std::string>(fields["username"]));
             server->sendMessage(*client, response);
             client->name = std::get<std::string>(fields["username"]);
@@ -121,8 +124,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             auto id = std::stoi(std::get<std::string>(fields["message_id"]));
             if (id >= server->groups.at(group_id)->messages.size()) {
-                // Requesting an invalid message id
-                // Send error message
+                // Requesting an invalid message id, send error message
                 auto resp = spam_api::gen::respond::message(false, "invalid message id");
                 server->sendMessage(*client, resp);
                 continue;
@@ -143,8 +145,10 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                 server->sendMessage(*client, resp);
                 continue;
             }
+            std::cout << "User " << client->name << " is leaving group " << group_id << std::endl;
             auto resp = spam_api::gen::respond::leave(true, client->name);
             server->sendMessage(*client, resp);
+
             // Remove the client from the server's lists
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 if (server->groups.at(group_id)->clientUsernames.at(i) == client->name) {
@@ -175,6 +179,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
     }
 
     // Erase client when thread is done
+    std::cout << "Bye bye " << client->name << std::endl;
     for (int i = 0; i < server->clients.size(); i++) {
         if (server->clients.at(i)->name == client->name) {
             server->clients.erase(server->clients.begin()+i);
