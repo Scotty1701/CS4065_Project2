@@ -7,7 +7,9 @@ import pyspam
 from datetime import datetime
 import inspect
 
-event_list = ["log", "group", "message", "exit"]
+event_list = [
+    "log", "group", "message", "exit", "post", "join", "connect", "leave"
+]
 
 
 def threaded(func):
@@ -30,6 +32,7 @@ class Client:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.write_event = write_event
         self.recieve_thread = self.recieve()
+        self.username = None
 
     def connect(self, address: str = "127.0.0.1", port: str = "42000"):
         """ connect address port """
@@ -37,7 +40,6 @@ class Client:
         self.recieve_thread.start()
         message = pyspam.gen.request.connect(address, port)
         self.server_socket.sendall(message.encode())
-        self.write_event("log", "successfully connected")
 
     @threaded
     def recieve(self):
@@ -52,8 +54,9 @@ class Client:
 
     def dispatch(self, message):
         parsed = pyspam.parse(message)
+        ogmessage = json.loads(message)
         message_type = parsed["message_type"]
-        if message_type in event_list:
+        if message_type in event_list and ogmessage["success"]:
             self.write_event(message_type, parsed)
         else:
             self.write_event("log", parsed)
@@ -61,6 +64,7 @@ class Client:
     def join(self, username: str, groupid: str = "1"):
         """ join the server (join username groupid"""
         message = pyspam.gen.request.join(username, groupid)
+        self.username = username
         self.server_socket.sendall(message.encode())
 
     def exit(self):
@@ -68,11 +72,11 @@ class Client:
         self.server_socket.close()
         self.write_event("exit")
 
-    def post(self,
-             username: str,
-             subject: str,
-             content: str,
-             groupname: str = "1"):
+    def post(self, subject: str, content: str, groupname: str = "1"):
+        if not self.username:
+            self.write_event("log",
+                             "You can't post messages without a username!!!")
+        username = self.username
         now = datetime.now().strftime("%H:%M%S")
         message = pyspam.gen.request.post(groupname, username, now, subject,
                                           content)
@@ -103,6 +107,3 @@ class Client:
             self.write_event("log", f"{f.__doc__}" + f"\nargs:\n{args}")
             return
         self.write_event("log", f"Available commands:{self.command_list}")
-        # import time
-        # time.sleep(2)
-        # self.write_event("message", ["hi", "world"])

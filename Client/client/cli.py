@@ -89,7 +89,7 @@ class CLI:
         self.events[key] = value
 
     def log(self, content=""):
-        self.safe_print(content, log=True)
+        self.safe_print(content, log=False)
 
     def exit(self, *args):
         self.on = False
@@ -98,13 +98,22 @@ class CLI:
     def post(self, value):
         self.safe_print("message delivered successfully")
 
+    def connect(self, value):
+        self.safe_print("connected successfully")
+
+    def join(self, value):
+        self.safe_print("joined successfully")
+
+    def leave(self, value):
+        self.safe_print("left successfully")
+
     def message(self, value):
         username, subject, content, id, date, group = value["sender"], value[
             "subject"], value["content"], value["message_id"], value[
                 "post_date"], value["group_id"]
         t = Table(
             Column(header=subject, justify="center"),
-            title=f"from: {username} id:{id} group:{group}",
+            title=f"from:{username} id:{id} group:{group}",
             expand=True,
         )
         t.add_row(Align(content, align="left"))
