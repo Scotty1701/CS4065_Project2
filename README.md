@@ -2,6 +2,8 @@
 
 David Lewis, Isaac Poplin
 
+See the git repo [here](https://github.com/Scotty1701/CS4065_Project2)
+
 # Usage
 
 Some of the usage instructions for the client are different from
