@@ -38,6 +38,8 @@ To run the programs in the repo, you can either go the nix route (probably easie
 
 > note that the docker image can be generated using the `nix build .#docker` command if you really want the container separately
 
+Get the docker file [here](https://github.com/Scotty1701/CS4065_Project2/releases/download/v1.0.0/project)
+
 > Assuming you have the docker image file
 
 - `docker load -i image`
