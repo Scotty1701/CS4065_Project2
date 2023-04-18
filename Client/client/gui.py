@@ -11,10 +11,11 @@ import sys
 
 class gui:
 
-    def __init__(self, theme):
+    def __init__(self, theme, debug):
         # set of groups, each containing a list of messages
         self.group_id = None
         self.console = Console()
+        self.debug = debug
 
         # display theme preview
         if theme == "preview":
@@ -120,6 +121,8 @@ class gui:
             elif ogevent in event_list:
                 f = getattr(self, ogevent)
                 f(values[ogevent])
+                if self.debug:
+                    self.log(values[ogevent])
 
             # rint(event, values)
 

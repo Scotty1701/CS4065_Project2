@@ -12,10 +12,18 @@ def cli():
 
 @cli.command(help="Start the Graphical user interface!")
 @click.option('--theme', default="Dark Green", help="Set the theme!")
-def gui(theme):
-    g = G(theme)
+@click.option('--debug',
+              is_flag=True,
+              default=False,
+              help="print raw server messages")
+def gui(theme, debug):
+    g = G(theme, debug)
 
 
 @cli.command(name="cli", help="Start the command line interface!")
-def C():
-    c = CLI()
+@click.option('--debug',
+              is_flag=True,
+              default=False,
+              help="print raw server messages")
+def C(debug):
+    c = CLI(debug)

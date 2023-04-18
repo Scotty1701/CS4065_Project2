@@ -25,8 +25,9 @@ class Exit(Exception):
 
 class CLI:
 
-    def __init__(self):
+    def __init__(self, debug):
         """ Create the CLI object, starting the event and input loops"""
+        self.debug = debug
         self.console = Console()
         self.output = ""
         self.events = {}
@@ -51,6 +52,8 @@ class CLI:
                     # if event in this class, run function
                     f = getattr(self, event)
                     f(value)
+                    if self.debug:
+                        self.log(value)
 
     @threaded
     def __input(self):
