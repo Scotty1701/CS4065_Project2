@@ -4,6 +4,8 @@ from .client import Client
 from .client import event_list
 from rich import print
 from rich.panel import Panel
+from rich.console import Console
+from rich.text import Text
 
 
 class gui:
@@ -11,6 +13,7 @@ class gui:
     def __init__(self, theme):
         # set of groups, each containing a list of messages
         self.group_id = None
+        self.console = Console()
 
         # display theme preview
         if theme == "preview":
@@ -147,13 +150,13 @@ class gui:
         Thread(target=self.client.post, args=(subject, content)).start()
 
     def log(self, value):
-        print(value)
+        self.print(value, title="log")
 
     def join(self, value):
-        print(value)
+        self.print("successfully joined group")
 
     def connect(self, value):
-        print(value)
+        self.print("successfully connected to server")
 
     def getgroups(self, value):
         groups = value["groups"]
@@ -162,10 +165,10 @@ class gui:
             self.window["GUI_join"].update(set_to_index=self.group_id)
 
     def post(self, value):
-        print(value)
+        self.print("message was successfully delivered")
 
     def leave(self, value):
-        print(value)
+        self.print("group was left successfully")
 
     def exit(self, value):
         print(value)
@@ -192,6 +195,13 @@ class gui:
                                       end="\n\n")
         self.window["GUI_content"].update("")
         self.window["GUI_subject"].update("")
+
+    def print(self, message, title=None):
+        with self.console.capture() as capture:
+            self.console.print(message)
+        out = capture.get()
+        text = Text.from_ansi(out)
+        print(Panel.fit(text, title=title, padding=0))
 
 
 if __name__ == "__main__":
