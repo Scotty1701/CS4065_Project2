@@ -34,7 +34,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         auto result = server->sockets.receive_from_client(client->socket, client->buffer.get(), client->bufferLen);
         if (result == 0) {
             // Client disconnected, return
-            return;
+            break;
         }
         std::string newMessage{client->buffer.get()};
         std::cout << "read to buffer" << std::endl;
@@ -45,7 +45,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
         // Respond appropriately
         if (messageType == "connect") {
-            // Don't need?
             std::string response = spam_api::gen::respond::connect(true, "Connected");
             server->sendMessage(*client, response);
             std::cout << "Sent response to connect" << std::endl;
@@ -78,7 +77,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             // Let other users know a another user joined
             std::cout << "Yo new client just dropped" << std::endl;
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
-                if (server->clients.at(i)->name != client->name) {
+                if (server->groups.at(group_id)->clientUsernames.at(i) != client->name) {
                     std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
                     std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
                     server->sendMessage(*server->clients.at(i), response);
@@ -101,7 +100,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             // Store the message
             std::map<std::string, std::string> tempMessage;
-            //tempMessage["message_id"] = std::get<std::string>(fields["message_id"]);
             tempMessage["message_id"] = std::to_string(server->groups.at(group_id)->messages.size());
             tempMessage["sender"] = std::get<std::string>(fields["sender"]);
             tempMessage["post_date"] = std::get<std::string>(fields["post_date"]);
@@ -154,12 +152,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                     break;
                 }
             }
-            for (int i = 0; i < server->clients.size(); i++) {
-                if (server->clients.at(i)->name == client->name) {
-                    server->clients.erase(server->clients.begin()+i);
-                    break;
-                }
-            }
             // Update the other users on the change
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
@@ -181,6 +173,15 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->sendMessage(*client, response);
         }
     }
+
+    // Erase client when thread is done
+    for (int i = 0; i < server->clients.size(); i++) {
+        if (server->clients.at(i)->name == client->name) {
+            server->clients.erase(server->clients.begin()+i);
+            break;
+        }
+    }
+    return;
 }
 
 // Client Implementation
