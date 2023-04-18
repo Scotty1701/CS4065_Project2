@@ -42,7 +42,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         std::cout << "parsed message" << std::endl;
         std::string messageType = std::get<std::string>(fields["message_type"]);
         std::cout << "Message type: " << messageType << std::endl;
-        std::cout << "Message from: " << client->name << ", " << std::to_string(client->socket) << std::endl;
 
         // Respond appropriately
         if (messageType == "connect") {
@@ -84,7 +83,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             }
             // Inform client of last 2 messages posted
             std::cout << "sending previous messages" << std::endl;
-            std::cout << server->groups.at(group_id)->messages.size() << std::endl;
             for (int i = server->groups.at(group_id)->messages.size();
                  (i > server->groups.at(group_id)->messages.size()-2) || (i > 0);
                  i--) {
@@ -94,8 +92,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                 auto content = server->groups.at(group_id)->messages.at(i-1)["content"];
                 auto resp = spam_api::gen::respond::message(std::to_string(i-1), std::to_string(group_id), sender, post_date, subject, content);
                 server->sendMessage(*client, resp);
-                std::cout << std::to_string(i) << std::endl;
-                std::cout << subject << ", " << content << std::endl;
             }
         } else if (messageType == "post") {
             std::cout << "Request for post" << std::endl;
@@ -135,18 +131,15 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             auto resp = spam_api::gen::respond::leave(true, client->name);
             server->sendMessage(*client, resp);
-            std::cout << "Told client to get out" << std::endl;
             // Remove the client from the server's lists
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 if (server->groups.at(group_id)->clientUsernames.at(i) == client->name) {
-                    std::cout << "erasing clientUsername: " << server->groups.at(group_id)->clientUsernames.at(i) << std::endl;
                     server->groups.at(group_id)->clientUsernames.erase(server->groups.at(group_id)->clientUsernames.begin()+i);
                     break;
                 }
             }
             for (int i = 0; i < server->clients.size(); i++) {
                 if (server->clients.at(i)->name == client->name) {
-                    std::cout << "erasing client: " << server->clients.at(i) << std::endl;
                     server->clients.erase(server->clients.begin()+i);
                 }
             }
