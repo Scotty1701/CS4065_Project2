@@ -49,12 +49,15 @@ class Client:
             left = message.count("{")
             right = message.count("}")
             if right == left:
-                self.dispatch(message)
+                self.dispatch(message.split("}")[0] + '}')
                 message = ""
 
     def dispatch(self, message):
         parsed = pyspam.parse(message)
-        ogmessage = json.loads(message)
+        try:
+            ogmessage = json.loads(message)
+        except json.decoder.JSONDecodeError as e:
+            print(message)
         message_type = parsed["message_type"]
         if message_type in event_list and ogmessage["success"]:
             self.write_event(message_type, parsed)
@@ -65,6 +68,7 @@ class Client:
         """ join the server (join username groupid"""
         message = pyspam.gen.request.join(username, groupid)
         self.username = username
+        self.group_id = groupid
         self.server_socket.sendall(message.encode())
 
     def exit(self):
@@ -72,25 +76,41 @@ class Client:
         self.server_socket.close()
         self.write_event("exit")
 
-    def post(self, subject: str, content: str, groupname: str = "1"):
+    def post(self, subject: str, *content: str):
         if not self.username:
             self.write_event("log",
                              "You can't post messages without a username!!!")
+            return
         username = self.username
+        groupname = self.group_id
         now = datetime.now().strftime("%H:%M%S")
         message = pyspam.gen.request.post(groupname, username, now, subject,
-                                          content)
+                                          " ".join(content))
         self.server_socket.sendall(message.encode())
 
-    def message(self, group_id, message_id):
+    def message(self, message_id):
+        if not group_id:
+            self.write_event(
+                "log", "you can't get messages from a group you aren't in!!!")
+            return
+        group_id = self.group_id
         message = pyspam.gen.request.message(group_id, message_id)
         self.server_socket.sendall(message.encode())
 
-    def leave(self, group_id="1"):
+    def leave(self):
+        if not group_id:
+            self.write_event("log", "you can't leave without joining first!!!")
+            return
+        group_id = self.group_id
         message = pyspam.gen.request.leave(group_id)
         self.server_socket.sendall(message.encode())
 
-    def getusers(self, group_id="1"):
+    def getusers(self):
+        if not group_id:
+            self.write_event(
+                "log", "you can't get users from a group you aren't in!!!")
+            return
+        group_id = self.group_id
         message = pyspam.gen.request.getusers(group_id)
         self.server_socket.sendall(message.encode())
 
