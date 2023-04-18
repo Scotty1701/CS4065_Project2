@@ -42,7 +42,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         std::cout << "parsed message" << std::endl;
         std::string messageType = std::get<std::string>(fields["message_type"]);
         std::cout << "Message type: " << messageType << std::endl;
-        std::cout << "Message from: " << client->name << std::endl;
+        std::cout << "Message from: " << client->name << ", " << std::to_string(client->socket) << std::endl;
 
         // Respond appropriately
         if (messageType == "connect") {
