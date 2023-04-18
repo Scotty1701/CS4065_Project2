@@ -73,9 +73,12 @@ class CLI:
                     )
                     self.console.print(Text.from_ansi(self.output))
 
-    def safe_print(self, s):
+    def safe_print(self, s, log=False):
         with self.console.capture() as capture:
-            self.console.print(s)
+            if log:
+                self.console.log(s)
+            else:
+                self.console.print(s)
         self.output += capture.get()
         self.print_event.set()
 
@@ -83,15 +86,17 @@ class CLI:
         self.events[key] = value
 
     def log(self, content=""):
-        self.safe_print(content)
+        self.safe_print(content, log=True)
 
     def exit(self, *args):
         self.on = False
         sys.exit(0)
 
     def message(self, value):
-        username, content = value
+        username, subject, content = value["sender"], value["subject"], value[
+            "content"]
         t = Table()
         t.add_column(username)
+        t.add_row(subject)
         t.add_row(content)
         self.safe_print(t)

@@ -48,9 +48,15 @@ class Client:
             right = message.count("}")
             if right == left:
                 self.dispatch(message)
+                message = ""
 
     def dispatch(self, message):
-        self.write_event("log", message)
+        parsed = pyspam.parse(message)
+        message_type = parsed["message_type"]
+        if message_type in event_list:
+            self.write_event(message_type, parsed)
+        else:
+            self.write_event("log", parsed)
 
     def join(self, username: str, groupid: str = "1"):
         """ join the server (join username groupid"""
@@ -94,9 +100,7 @@ class Client:
             sig = inspect.signature(f)
             args = list(sig.parameters.values())
             args = [str(arg) for arg in args]
-            self.write_event(
-                "log",
-                getattr(self, command).__doc__ + f"\nargs:\n{args}")
+            self.write_event("log", f"{f.__doc__}" + f"\nargs:\n{args}")
             return
         self.write_event("log", f"Available commands:{self.command_list}")
         # import time
