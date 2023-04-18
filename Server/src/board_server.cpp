@@ -158,12 +158,12 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                     break;
                 }
             }
-            for (int i = 0; i < server->clients.size(); i++) {
-                if (server->clients.at(i)->name == client->name) {
-                    server->clients.erase(server->clients.begin()+i);
-                    break;
-                }
-            }
+            //for (int i = 0; i < server->clients.size(); i++) {
+            //    if (server->clients.at(i)->name == client->name) {
+            //        server->clients.erase(server->clients.begin()+i);
+            //        break;
+            //    }
+            //}
             std::cout << "After client removal" << std::endl;
             std::cout << "Length of clients: " << server->clients.size() << std::endl;
             std::cout << "Length of clientsUsernames: " << server->groups.at(group_id)->clientUsernames.size() << std::endl;
