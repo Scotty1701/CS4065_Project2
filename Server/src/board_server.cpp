@@ -34,7 +34,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
         auto result = server->sockets.receive_from_client(client->socket, client->buffer.get(), client->bufferLen);
         if (result == 0) {
             // Client disconnected, return
-            return;
+            break;
         }
         std::string newMessage{client->buffer.get()};
         std::cout << "read to buffer" << std::endl;
@@ -158,12 +158,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                     break;
                 }
             }
-            //for (int i = 0; i < server->clients.size(); i++) {
-            //    if (server->clients.at(i)->name == client->name) {
-            //        server->clients.erase(server->clients.begin()+i);
-            //        break;
-            //    }
-            //}
             std::cout << "After client removal" << std::endl;
             std::cout << "Length of clients: " << server->clients.size() << std::endl;
             std::cout << "Length of clientsUsernames: " << server->groups.at(group_id)->clientUsernames.size() << std::endl;
@@ -188,6 +182,15 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->sendMessage(*client, response);
         }
     }
+
+    // Erase client when thread is done
+    for (int i = 0; i < server->clients.size(); i++) {
+        if (server->clients.at(i)->name == client->name) {
+            server->clients.erase(server->clients.begin()+i);
+            break;
+        }
+    }
+    return;
 }
 
 // Client Implementation
