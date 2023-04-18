@@ -2,4 +2,10 @@
 
 - `log`, prints to debug area
 - `message`, prints to message area, value must include username, subject, and content
-- `groups`, prints to group area, adds group to list
+- `getgroups`, prints to group area, adds group to list
+- `message`, prints to message area,
+- `exit`, kills client safely,
+- `post`, post reply,
+- `join`, join reply
+- `connect`, connect reply
+- `leave`, leave reply

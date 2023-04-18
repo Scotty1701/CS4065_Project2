@@ -11,7 +11,11 @@ def cli():
 
 
 @cli.command(help="Start the Graphical user interface!")
-@click.option('--theme', default="Dark Green", help="Set the theme!")
+@click.option(
+    '--theme',
+    default="Dark Green",
+    help="Set the theme!, view possible themes with preview, set theme with quotes around name"
+)
 @click.option('--debug',
               is_flag=True,
               default=False,
