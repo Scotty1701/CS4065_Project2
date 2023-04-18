@@ -51,6 +51,7 @@ int WinsockManager::create_listener() {
         throw exception(message.c_str());
     }
 
+    setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, new char{1}, sizeof(int));
     int bind_result = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
 
     if (bind_result == SOCKET_ERROR) {
