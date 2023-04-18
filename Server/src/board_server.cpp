@@ -141,6 +141,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             for (int i = 0; i < server->clients.size(); i++) {
                 if (server->clients.at(i)->name == client->name) {
                     server->clients.erase(server->clients.begin()+i);
+                    break;
                 }
             }
             // Update the other users on the change
