@@ -6,8 +6,6 @@ from rich import print as print
 from rich.table import Table
 from getkey import getkey, keys
 import sys
-import curses
-import readline
 from threading import Event
 from threading import Thread
 import signal

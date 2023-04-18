@@ -90,26 +90,35 @@ class gui:
         self.window = sg.Window('Window Title', self.layout, resizable=True)
         self.client = Client(self.window.write_event_value)
         self.username = None
-        while True:
-            self.__event_loop()
+        self.__event_loop()
         self.window.close()
 
     def __event_loop(self):
-        event, values = self.window.read()
-        if event == sg.WIN_CLOSED:
-            return
-        if event == "Send":
-            message = values["message"]
-            self.window["message"]("")
-            if self.username and self.current_group:
-                self.create_message(self.username, message)
-            else:
-                print("no username")
-        if event == "Connect":
-            self.username = values["username"]
-            self.client.connect(values["address"])
+        while True:
+            event, values = self.window.read()
+            if event.split("_")[1] in event_list:
+                f = getattr(self, event)
+                f(values)
+            if event in self.client.command_list:
+                f(values)
 
-    def create_message(self, username, message):
+            if event == sg.WIN_CLOSED:
+                return
+            if event == "post":
+                message = values["message"]
+                self.window["message"]("")
+                if self.username and self.current_group:
+                    self.create_message(self.username, message)
+                else:
+                    print("no username")
+            if event == "Connect":
+                self.username = values["username"]
+                self.client.connect(values["address"])
+
+    def message(self, value):
+        username, subject, content, id, date, group = value["sender"], value[
+            "subject"], value["content"], value["message_id"], value[
+                "post_date"], value["group_id"]
         self.window["messages"].print("",
                                       username,
                                       text_color=self.colors["TEXT_INPUT"],
