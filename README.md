@@ -25,6 +25,8 @@ To run the programs in the repo, you can either go the nix route (probably easie
 
 ## Nix route
 
+> Note: the .nix files replace the tradition Makefile, the only thing you need to install is nix, it will handle all dependencies
+
 - Install [nix](https://nixos.org/download.html#nix-install-linux) for your favorite
   Unix/wsl2 operating system. (macOS is untested).
 - Enable flakes by running `echo experimental-features = nix-command flakes >> ~/.config/nix/nix.conf` or
@@ -40,7 +42,7 @@ To run the programs in the repo, you can either go the nix route (probably easie
 
 - `docker load -i image`
 
-If you want the gui to work you'll need wsl2 on Windows (untested) or a Linux environment:
+If you want the gui to work you'll need wsl2 on Windows 11 (untested) or a Linux environment:
 
 - you'll need `xhost` (`sudo apt install x11-utils`)
 
@@ -103,4 +105,8 @@ client cli
 - Making the client and server mature at the same time was very difficult.
   It involved a lot of back and forth between teammates to ensure we were implementing the right kind of communication
 
-- client gui was more difficult than anticipated, I also chose a very limited gui framework by accident, haven't really worked with GUIs before
+- client gui was more difficult than anticipated,
+  I also chose a very limited gui framework by accident,
+  and haven't really worked with GUIs a lot before. I'm pretty happy with the final result though.
+
+-

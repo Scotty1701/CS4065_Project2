@@ -75,6 +75,7 @@ class Client:
 
     @threaded
     def recieve(self):
+        """ listens for messages at all times, calling dispatch when it recieves a valid message"""
         message = ""
         while True:
             try:
@@ -93,6 +94,7 @@ class Client:
                 message = ""
 
     def dispatch(self, message):
+        """ calls an appropriate functino based on the message """
         parsed = pyspam.parse(message)
         try:
             ogmessage = json.loads(message)
