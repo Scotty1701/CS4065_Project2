@@ -53,22 +53,25 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             std::cout << "Request to join group " << group_id << std::endl;
             std::string newUsername = std::get<std::string>(fields["username"]);
+            std::string response = spam_api::gen::respond::join(true, "User added");
+
+            // Check for duplicate username
             for (std::string username : server->groups.at(group_id)->clientUsernames) {
                 if (newUsername == username) {
                     // Duplicate Username
                     // Send failed join response
-                    std::string response = spam_api::gen::respond::join(false, "Duplicate username");
+                    response = spam_api::gen::respond::join(false, "Duplicate username");
                     server->sendMessage(*client, response);
-                    // TODO: Cleanup this client and close the port
-                    // TODO: Return from this thread
-                    std::cout << "Returning" << std::endl;
-                    return;
+
                 }
+            }
+            if (std::get<std::string>(spam_api::parse(response)["success"]) == "false") {
+                // Unable to add user, skip rest of this iteration and wait for next message
+                continue;
             }
 
             // Didn't return so username is new, add it to list and respond w/ success
             server->groups.at(group_id)->clientUsernames.push_back(std::get<std::string>(fields["username"]));
-            std::string response = spam_api::gen::respond::join(true, "User added");
             server->sendMessage(*client, response);
             client->name = std::get<std::string>(fields["username"]);
 
