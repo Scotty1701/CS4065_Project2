@@ -33,6 +33,7 @@ class Client:
         self.write_event = write_event
         self.recieve_thread = self.recieve()
         self.username = None
+        self.group_id = None
 
     def connect(self, address: str = "127.0.0.1", port: str = "42000"):
         """ connect address port """
@@ -64,7 +65,7 @@ class Client:
         else:
             self.write_event("log", parsed)
 
-    def join(self, username: str, groupid: str = "1"):
+    def join(self, username: str, groupid: str = "0"):
         """ join the server (join username groupid"""
         message = pyspam.gen.request.join(username, groupid)
         self.username = username
@@ -77,6 +78,7 @@ class Client:
         self.write_event("exit")
 
     def post(self, subject: str, *content: str):
+        """ send messages !!"""
         if not self.username:
             self.write_event("log",
                              "You can't post messages without a username!!!")
@@ -89,6 +91,7 @@ class Client:
         self.server_socket.sendall(message.encode())
 
     def message(self, message_id):
+        """ get messages !!"""
         if not self.group_id:
             self.write_event(
                 "log", "you can't get messages from a group you aren't in!!!")
@@ -98,6 +101,7 @@ class Client:
         self.server_socket.sendall(message.encode())
 
     def leave(self):
+        """ leave the group """
         if not self.group_id:
             self.write_event("log", "you can't leave without joining first!!!")
             return
@@ -106,6 +110,7 @@ class Client:
         self.server_socket.sendall(message.encode())
 
     def getusers(self):
+        """ get the users """
         if not self.group_id:
             self.write_event(
                 "log", "you can't get users from a group you aren't in!!!")
@@ -115,10 +120,12 @@ class Client:
         self.server_socket.sendall(message.encode())
 
     def getgroups(self, *args):
+        """ get the groups """
         message = pyspam.gen.request.getgroups()
         self.server_socket.sendall(message.encode())
 
     def help(self, command=None):
+        """ we know you need it """
         if command:
             f = getattr(self, command)
             sig = inspect.signature(f)

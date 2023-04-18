@@ -58,7 +58,14 @@ class CLI:
             if len(args) > 0 and args[0] in self.client.command_list:
                 f = getattr(self.client, args[0])
                 self.print_event.clear()
-                Thread(target=f, args=args[1:]).start()
+
+                def thread_wrapper(*args):
+                    try:
+                        f(*args)
+                    except TypeError as e:
+                        self.write_event("log", "you goofed!!")
+
+                Thread(target=thread_wrapper, args=args[1:]).start()
             elif len(args) > 0 and args[0] == "output":
                 self.print_event.wait(2)
                 with self.console.pager(styles=False):
