@@ -76,8 +76,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
             // Let other users know a another user joined
             std::cout << "Yo new client just dropped" << std::endl;
-            std::cout << "Length of clients: " << server->clients.size() << std::endl;
-            std::cout << "Length of clientsUsernames: " << server->groups.at(group_id)->clientUsernames.size() << std::endl;
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 if (server->groups.at(group_id)->clientUsernames.at(i) != client->name) {
                     std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
@@ -102,7 +100,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             // Store the message
             std::map<std::string, std::string> tempMessage;
-            //tempMessage["message_id"] = std::get<std::string>(fields["message_id"]);
             tempMessage["message_id"] = std::to_string(server->groups.at(group_id)->messages.size());
             tempMessage["sender"] = std::get<std::string>(fields["sender"]);
             tempMessage["post_date"] = std::get<std::string>(fields["post_date"]);
@@ -149,18 +146,12 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             auto resp = spam_api::gen::respond::leave(true, client->name);
             server->sendMessage(*client, resp);
             // Remove the client from the server's lists
-            std::cout << "Client " << client->name << " wants to leave" << std::endl;
-            std::cout << "Length of clients: " << server->clients.size() << std::endl;
-            std::cout << "Length of clientsUsernames: " << server->groups.at(group_id)->clientUsernames.size() << std::endl;
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 if (server->groups.at(group_id)->clientUsernames.at(i) == client->name) {
                     server->groups.at(group_id)->clientUsernames.erase(server->groups.at(group_id)->clientUsernames.begin()+i);
                     break;
                 }
             }
-            std::cout << "After client removal" << std::endl;
-            std::cout << "Length of clients: " << server->clients.size() << std::endl;
-            std::cout << "Length of clientsUsernames: " << server->groups.at(group_id)->clientUsernames.size() << std::endl;
             // Update the other users on the change
             for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
                 std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
