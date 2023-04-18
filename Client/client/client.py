@@ -61,7 +61,8 @@ class Client:
         try:
             self.server_socket.connect((address, int(port)))
         except OSError:
-            print("can't connect to socket, maybe server isn't running?")
+            self.write_event(
+                "log", "can't connect to socket, maybe server isn't running")
             return
         except ValueError:
             self.write_event(
@@ -99,7 +100,8 @@ class Client:
         try:
             ogmessage = json.loads(message)
         except json.decoder.JSONDecodeError as e:
-            print(message)
+            self.write_event("log",
+                             "server sent an invalid message, maybe it died?")
         message_type = parsed["message_type"]
         if message_type == "":
             self.write_event("log", "Lost connection to server")
