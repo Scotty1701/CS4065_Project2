@@ -166,7 +166,6 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
                 std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
                 server->sendMessage(*server->clients.at(i), response);
             }
-            return;
         } else if (messageType == "getusers") {
             std::cout << "Request for getusers" << std::endl;
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
