@@ -13,7 +13,10 @@ from threading import Thread
 import signal
 from rich.console import Console
 from rich.text import Text
+from rich.table import Column
+from rich.align import Align
 import os
+import json
 
 os.system("")
 
@@ -92,11 +95,17 @@ class CLI:
         self.on = False
         sys.exit(0)
 
+    def post(self, value):
+        self.safe_print("message delivered successfully")
+
     def message(self, value):
-        username, subject, content = value["sender"], value["subject"], value[
-            "content"]
-        t = Table()
-        t.add_column(username)
-        t.add_row(subject)
-        t.add_row(content)
+        username, subject, content, id, date, group = value["sender"], value[
+            "subject"], value["content"], value["message_id"], value[
+                "post_date"], value["group_id"]
+        t = Table(
+            Column(header=subject, justify="center"),
+            title=f"from: {username} id:{id} group:{group}",
+            expand=True,
+        )
+        t.add_row(Align(content, align="left"))
         self.safe_print(t)
