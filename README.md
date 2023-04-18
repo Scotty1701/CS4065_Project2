@@ -1,4 +1,21 @@
-# Running
+# Usage
+
+Some of the usage instructions for the client are different from
+what was given in the assignment, refer to the README in the `Client` directory for more info.
+
+To start the server:
+
+```
+server
+```
+
+To start the client (it should walk you through it):
+
+```
+client
+```
+
+# Getting up and Running
 
 To run the programs in the repo, you can either go the nix route (probably easier), docker route (also fairly easy), or the manual route.
 
@@ -76,3 +93,10 @@ client cli
 
 - First follow the build instructions in the README of the `Protocol` directory.
 - Then follow the build/run instructions in each of the `Client` and `Server` directories
+
+# Major struggles
+
+- Making the client and server mature at the same time was very difficult.
+  It involved a lot of back and forth between teammates to ensure we were implementing the right kind of communication
+
+- client gui was more difficult than anticipated, I also chose a very limited gui framework by accident, haven't really worked with GUIs before

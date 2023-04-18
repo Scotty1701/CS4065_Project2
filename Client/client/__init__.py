@@ -1,3 +1,4 @@
+""" This is the click interface, it handles how to start the cli/gui """
 import rich_click as click
 from .gui import gui as G
 from .cli import CLI
