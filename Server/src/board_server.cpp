@@ -172,6 +172,14 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
             std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
             server->sendMessage(*client, response);
+        } else if (messageType == "getgroups") {
+            std::cout << "Request for getgroups" << std::endl;
+            std::vector<std::string> group_list;
+            for (auto group : server->groups) {
+                group_list.push_back(std::to_string(group->group_id));
+            }
+            std::string response = spam_api::gen::respond::getgroups(group_list);
+            server->sendMessage(*client, response);
         }
     }
 }
