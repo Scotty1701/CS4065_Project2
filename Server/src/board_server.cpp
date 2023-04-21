@@ -26,7 +26,7 @@ void BoardServer::sendMessage(UserConnection& client, std::string message) {
 }
 
 // Handle receiving and responding to messages from clients
-void interactWithClient(BoardServer* server, UserConnection* client) {
+void interactWithClient(BoardServer* server, std::shared_ptr<UserConnection> client) {
     std::cout << "Started interaction function" << std::endl;
     std::cout << "Client: " << client->socket << std::endl;
     while (true) {
@@ -79,7 +79,7 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             }
 
             // Didn't continue so username is new, add it to list and respond w/ success
-            server->groups.at(group_id)->clients.push_back(std::make_shared<UserConnection>(client));
+            server->groups.at(group_id)->clients.push_back(std::make_shared<UserConnection>(*client));
             server->sendMessage(*client, response);
             client->name = std::get<std::string>(fields["username"]);
 
@@ -234,7 +234,7 @@ int main() {
         auto new_client = std::make_shared<UserConnection>(client_socket, 1024);
         //main_server.clients.push_back(new_client);
 
-        std::thread* tempThread = new std::thread(&interactWithClient, &main_server, new_client.get());
+        std::thread* tempThread = new std::thread(&interactWithClient, &main_server, new_client);
         tempThread->detach();
     }
     return 0;

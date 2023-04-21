@@ -14,7 +14,7 @@ class UserConnection {
         std::string name;
 
         int bufferLen;
-        std::unique_ptr<char[]> buffer;
+        std::shared_ptr<char[]> buffer;
 
         UserConnection(SOCKET socket, int bufferLen);
 };
