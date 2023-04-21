@@ -144,13 +144,19 @@ class gui:
         if username == "":
             sg.popup_ok("you need to enter a username to join a group")
             return
+        self.username == username
         self.group_id = values["GUI_join"][0]
-        self.window["GUI_join"].update(set_to_index=self.group_id)
+        if self.client.group_id and self.group_id in self.client.group_id:
+            Thread(target=self.client.leave, args=(self.group_id)).start()
+            return
 
         self.window["messages"].update("")
         Thread(target=self.client.join, args=(username, self.group_id)).start()
 
     def GUI_post(self, values):
+        if not (self.client.username == values["username"]):
+            self.print(self.username, values)
+            return
         subject = values["GUI_subject"]
         content = values["GUI_content"]
         Thread(target=self.client.post, args=(subject, content)).start()
@@ -159,6 +165,7 @@ class gui:
         self.print(value, title="log")
 
     def join(self, value):
+        self.window["GUI_join"].update(set_to_index=self.client.group_id)
         self.print("successfully joined group")
 
     def connect(self, value):
@@ -174,6 +181,7 @@ class gui:
         self.print("message was successfully delivered")
 
     def leave(self, value):
+        self.window["GUI_join"].update(set_to_index=self.client.group_id)
         self.print("group was left successfully")
 
     def exit(self, value):
@@ -185,6 +193,8 @@ class gui:
         username, subject, content, id, date, group = value["sender"], value[
             "subject"], value["content"], value["message_id"], value[
                 "post_date"], value["group_id"]
+        if not (group in self.client.group_id):
+            return
         self.window["messages"].print("",
                                       username,
                                       text_color=self.colors["TEXT_INPUT"],
