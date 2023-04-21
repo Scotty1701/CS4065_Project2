@@ -24,8 +24,11 @@ class UserConnection {
 class Group {
     public:
         int group_id;
-        std::vector<std::string> clientUsernames;
+        //std::vector<std::string> clientUsernames;
+        std::vector<std::shared_ptr<UserConnection>> clients;
         std::vector<std::map<std::string, std::string>> messages;
+
+        std::vector<std::string> getUsers();
 
         Group(int group_id);
 };
@@ -36,7 +39,7 @@ class BoardServer {
 
     public:
         WinsockManager sockets;
-        std::vector<std::shared_ptr<UserConnection>> clients;
+        //std::vector<std::shared_ptr<UserConnection>> clients;
         std::vector<std::shared_ptr<Group>> groups;
 
         // Start the server on the given port with the given number of groups

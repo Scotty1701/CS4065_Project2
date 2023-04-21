@@ -64,8 +64,8 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             std::string response = spam_api::gen::respond::join(true, "User added");
 
             // Check for duplicate username
-            for (std::string username : server->groups.at(group_id)->clientUsernames) {
-                if (newUsername == username) {
+            for (auto client : server->groups.at(group_id)->clients) {
+                if (newUsername == client->name) {
                     // Duplicate Username, send failed join response
                     std::cout << "User already in group!" << std::endl;
                     response = spam_api::gen::respond::join(false, "Duplicate username");
@@ -79,16 +79,16 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             }
 
             // Didn't continue so username is new, add it to list and respond w/ success
-            server->groups.at(group_id)->clientUsernames.push_back(std::get<std::string>(fields["username"]));
+            //server->groups.at(group_id)->clientUsernames.push_back(std::get<std::string>(fields["username"]));
             server->sendMessage(*client, response);
             client->name = std::get<std::string>(fields["username"]);
 
             // Let other users know a another user joined
             std::cout << "Yo new client just dropped" << std::endl;
-            for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
-                std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
-                std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
-                server->sendMessage(*server->clients.at(i), response);
+            for (int i = 0; i < server->groups.at(group_id)->clients.size(); i++) {
+                std::cout << "Notifying client: " << server->groups.at(group_id)->clients.at(i)->name << std::endl;
+                std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->getUsers());
+                server->sendMessage(*server->groups.at(group_id)->clients.at(i), response);
             }
             // Inform client of last 2 messages posted
             std::cout << "sending previous messages" << std::endl;
@@ -118,10 +118,10 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->sendMessage(*client, spam_api::gen::respond::post(true, tempMessage["message_id"]));
 
             // Notify other users a new message is available
-            for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
-                std::cout << "New message available, notifying client: " << server->clients.at(i)->name << std::endl;
+            for (int i = 0; i < server->groups.at(group_id)->clients.size(); i++) {
+                std::cout << "New message available, notifying client: " << server->groups.at(group_id)->clients.at(i)->name << std::endl;
                 std::string response = spam_api::gen::respond::message(tempMessage["message_id"], std::to_string(group_id), tempMessage["sender"], tempMessage["post_date"], tempMessage["subject"], tempMessage["content"]);
-                server->sendMessage(*server->clients.at(i), response);
+                server->sendMessage(*server->groups.at(group_id)->clients.at(i), response);
             }
         } else if (messageType == "message") {
             std::cout << "Request for message" << std::endl;
@@ -166,22 +166,22 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
             server->sendMessage(*client, resp);
 
             // Remove the client from the server's lists
-            for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
-                if (server->groups.at(group_id)->clientUsernames.at(i) == client->name) {
-                    server->groups.at(group_id)->clientUsernames.erase(server->groups.at(group_id)->clientUsernames.begin()+i);
+            for (int i = 0; i < server->groups.at(group_id)->clients.size(); i++) {
+                if (server->groups.at(group_id)->clients.at(i)->name == client->name) {
+                    server->groups.at(group_id)->clients.erase(server->groups.at(group_id)->clients.begin()+i);
                     break;
                 }
             }
             // Update the other users on the change
-            for (int i = 0; i < server->groups.at(group_id)->clientUsernames.size(); i++) {
-                std::cout << "Notifying client: " << server->clients.at(i)->name << std::endl;
-                std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
-                server->sendMessage(*server->clients.at(i), response);
+            for (int i = 0; i < server->groups.at(group_id)->clients.size(); i++) {
+                std::cout << "Notifying client: " << server->groups.at(group_id)->clients.at(i)->name << std::endl;
+                std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->getUsers());
+                server->sendMessage(*server->groups.at(group_id)->clients.at(i), response);
             }
         } else if (messageType == "getusers") {
             std::cout << "Request for getusers" << std::endl;
             int group_id = std::stoi(std::get<std::string>(fields["group_id"]));
-            std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->clientUsernames);
+            std::string response = spam_api::gen::respond::getusers(server->groups.at(group_id)->getUsers());
             server->sendMessage(*client, response);
         } else if (messageType == "getgroups") {
             std::cout << "Request for getgroups" << std::endl;
@@ -196,12 +196,12 @@ void interactWithClient(BoardServer* server, UserConnection* client) {
 
     // Erase client when thread is done
     std::cout << "Bye bye " << client->name << std::endl;
-    for (int i = 0; i < server->clients.size(); i++) {
-        if (server->clients.at(i)->name == client->name) {
-            server->clients.erase(server->clients.begin()+i);
-            break;
-        }
-    }
+    //for (int i = 0; i < server->clients.size(); i++) {
+    //    if (server->clients.at(i)->name == client->name) {
+    //        server->clients.erase(server->clients.begin()+i);
+    //        break;
+    //    }
+    //}
     return;
 }
 
@@ -212,6 +212,14 @@ UserConnection::UserConnection(SOCKET socket, int bufferLen)
 // Group Implementation
 Group::Group(int group_id)
     : group_id{group_id}{};
+
+std::vector<std::string> Group::getUsers() {
+    std::vector<std::string> names;
+    for (auto client : clients) {
+        names.push_back(client->name);
+    }
+    return names;
+}
 
 // Main event loop
 int main() {
@@ -224,7 +232,7 @@ int main() {
         // Listen for connections
         SOCKET client_socket{(SOCKET)main_server.sockets.accept_client()};
         auto new_client = std::make_shared<UserConnection>(client_socket, 1024);
-        main_server.clients.push_back(new_client);
+        //main_server.clients.push_back(new_client);
 
         std::thread* tempThread = new std::thread(&interactWithClient, &main_server, new_client.get());
         tempThread->detach();
