@@ -124,10 +124,11 @@ class Client:
             )
             return
 
-        if self.group_id:
-            self.leave()
         self.username = username
-        self.group_id = groupid
+        if not self.group_id:
+            self.group_id = [groupid]
+        else:
+            self.group_id += [groupid]
         self.sendall(message)
 
     def exit(self):
@@ -143,11 +144,16 @@ class Client:
             self.write_event(
                 "log", "You can't post messages without joining a group!!!")
             return
+        try:
+            groupname = int(subject)
+            subject = content[0]
+        except ValueError as e:
+            groupname = self.group_id[0]
+
         username = self.username
-        groupname = self.group_id
         now = datetime.now().strftime("%H:%M%S")
-        message = pyspam.gen.request.post(groupname, username, now, subject,
-                                          " ".join(content))
+        message = pyspam.gen.request.post(str(groupname), username, now,
+                                          subject, " ".join(content))
         self.sendall(message)
 
     def message(self, message_id):
@@ -160,15 +166,19 @@ class Client:
         message = pyspam.gen.request.message(group_id, message_id)
         self.sendall(message)
 
-    def leave(self):
+    def leave(self, group_id=None):
         """ leave the group """
+
         if not self.group_id:
             self.write_event("log", "you can't leave without joining first!!!")
             return
-        group_id = self.group_id
-        message = pyspam.gen.request.leave(group_id)
-
-        self.sendall(message)
+        if group_id:
+            group_id = [group_id]
+        else:
+            group_id = self.group_id
+        for id in group_id:
+            message = pyspam.gen.request.leave(id)
+            self.sendall(message)
         self.group_id = None
 
     def getusers(self):

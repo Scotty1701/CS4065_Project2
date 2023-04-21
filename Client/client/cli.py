@@ -70,6 +70,7 @@ class CLI:
                     try:
                         f(*args)
                     except TypeError as e:
+                        print(e)
                         self.write_event(
                             "log",
                             "you probably used the wrong number of arguments, please check help."
