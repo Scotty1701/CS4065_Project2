@@ -181,13 +181,16 @@ class Client:
             self.sendall(message)
         self.group_id = None
 
-    def getusers(self):
+    def getusers(self, group_id):
         """ get the users """
         if not self.group_id:
             self.write_event(
                 "log", "you can't get users from a group you aren't in!!!")
             return
-        group_id = self.group_id
+        if group_id:
+            pass
+        else:
+            group_id = self.group_id[0]
         message = pyspam.gen.request.getusers(group_id)
         self.sendall(message)
 

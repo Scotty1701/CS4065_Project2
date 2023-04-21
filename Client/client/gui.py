@@ -145,7 +145,13 @@ class gui:
             sg.popup_ok("you need to enter a username to join a group")
             return
         self.username == username
-        self.group_id = values["GUI_join"][0]
+        if self.client.group_id:
+            self.group_id = [
+                v for v in values["GUI_join"] if v not in self.client.group_id
+            ][0]
+        else:
+            self.group_id = values["GUI_join"][0]
+        self.print(self.client.group_id)
         if self.client.group_id and self.group_id in self.client.group_id:
             Thread(target=self.client.leave, args=(self.group_id)).start()
             return
@@ -182,6 +188,7 @@ class gui:
 
     def leave(self, value):
         self.window["GUI_join"].update(set_to_index=self.client.group_id)
+        self.print(self.client.group_id)
         self.print("group was left successfully")
 
     def exit(self, value):
