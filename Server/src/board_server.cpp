@@ -79,7 +79,7 @@ void interactWithClient(BoardServer* server, std::shared_ptr<UserConnection> cli
             }
 
             // Didn't continue so username is new, add it to list and respond w/ success
-            server->groups.at(group_id)->clients.push_back(std::make_shared<UserConnection>(*client));
+            server->groups.at(group_id)->clients.push_back(client);
             server->sendMessage(*client, response);
             client->name = std::get<std::string>(fields["username"]);
 
